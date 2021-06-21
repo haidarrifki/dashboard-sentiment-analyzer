@@ -1,34 +1,28 @@
-import React from "react";
+import React from 'react';
 // reactstrap components
-import { Container, Row, Col } from "reactstrap";
-
-// core components
-import AuthNavbar from "components/Navbars/AuthNavbar.js";
-import AuthFooter from "components/Footers/AuthFooter.js";
-
-import routes from "routes.js";
+import { Container, Row, Col } from 'reactstrap';
 
 function Auth(props) {
   React.useEffect(() => {
-    document.body.classList.add("bg-default");
+    document.body.classList.add('bg-default');
     // Specify how to clean up after this effect:
     return function cleanup() {
-      document.body.classList.remove("bg-default");
+      document.body.classList.remove('bg-default');
     };
   }, []);
   return (
     <>
       <div className="main-content">
-        <AuthNavbar />
+        {/* <AuthNavbar /> */}
         <div className="header bg-gradient-info py-7 py-lg-8">
           <Container>
             <div className="header-body text-center mb-7">
               <Row className="justify-content-center">
                 <Col lg="5" md="6">
-                  <h1 className="text-white">Welcome!</h1>
+                  <h1 className="text-white">Selamat Datang!</h1>
                   <p className="text-lead text-light">
-                    Use these awesome forms to login or create new account in
-                    your project for free.
+                    Dashboard Text Mining Untuk Analisis Sentimen Review Film
+                    Menggunakan Algoritma Naïve Bayes.
                   </p>
                 </Col>
               </Row>
@@ -55,7 +49,7 @@ function Auth(props) {
           <Row className="justify-content-center">{props.children}</Row>
         </Container>
       </div>
-      <AuthFooter />
+      {/* <AuthFooter /> */}
     </>
   );
 }

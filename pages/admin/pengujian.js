@@ -25,10 +25,12 @@ import Admin from "layouts/Admin.js";
 // core components
 import Header from "components/Headers/Header.js";
 
-function Tables() {
+import fetchJson from '../../lib/fetchJson';
+
+function Pengujian(props) {
   return (
     <>
-      <Header />
+      <Header data={props.statistic} />
       {/* Page content */}
       <Container className="mt--7" fluid>
         {/* Table */}
@@ -1632,6 +1634,13 @@ function Tables() {
   );
 }
 
-Tables.layout = Admin;
+Pengujian.layout = Admin;
 
-export default Tables;
+export async function getServerSideProps() {
+  const statistic = await fetchJson(`http://localhost:3000/api/statistics`);
+  return {
+    props: { statistic }, // will be passed to the page component as props
+  };
+}
+
+export default Pengujian;

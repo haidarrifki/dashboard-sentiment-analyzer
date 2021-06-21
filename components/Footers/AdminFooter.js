@@ -1,8 +1,8 @@
 /*eslint-disable*/
-import React from "react";
+import React from 'react';
 
 // reactstrap components
-import { Container, Row, Col, Nav, NavItem, NavLink } from "reactstrap";
+import { Container, Row, Col, Nav, NavItem, NavLink } from 'reactstrap';
 
 function Footer() {
   return (
@@ -10,14 +10,15 @@ function Footer() {
       <Row className="align-items-center justify-content-xl-between">
         <Col xl="6">
           <div className="copyright text-center text-xl-left text-muted">
-            © {new Date().getFullYear()}{" "}
+            {/* © {new Date().getFullYear()}{" "} */}
+            Made with <span className="ni ni-favourite-28 text-red"></span> by
             <a
               className="font-weight-bold ml-1"
-              href="https://www.creative-tim.com?ref=njsad-admin-footer"
+              href="https://haidarrifki.com"
               rel="noopener noreferrer"
               target="_blank"
             >
-              Creative Tim
+              Muhammad Haidar Rifki
             </a>
           </div>
         </Col>
@@ -26,27 +27,7 @@ function Footer() {
           <Nav className="nav-footer justify-content-center justify-content-xl-end">
             <NavItem>
               <NavLink
-                href="https://www.creative-tim.com?ref=njsad-admin-footer"
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                Creative Tim
-              </NavLink>
-            </NavItem>
-
-            <NavItem>
-              <NavLink
-                href="https://www.creative-tim.com/presentation?ref=njsad-admin-footer"
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                About Us
-              </NavLink>
-            </NavItem>
-
-            <NavItem>
-              <NavLink
-                href="http://blog.creative-tim.com?ref=njsad-admin-footer"
+                href="https://haidarrifki.com/posts"
                 rel="noopener noreferrer"
                 target="_blank"
               >
@@ -56,11 +37,11 @@ function Footer() {
 
             <NavItem>
               <NavLink
-                href="https://github.com/creativetimofficial/argon-dashboard/blob/master/LICENSE.md?ref=njsad-admin-footer"
+                href="https://github.com/haidarrifki"
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                MIT License
+                Github
               </NavLink>
             </NavItem>
           </Nav>

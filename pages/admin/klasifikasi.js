@@ -18,7 +18,9 @@ import Admin from "layouts/Admin.js";
 // core components
 import UserHeader from "components/Headers/UserHeader.js";
 
-function Profile() {
+import fetchJson from '../../lib/fetchJson';
+
+function Klasifikasi(props) {
   return (
     <>
       <UserHeader />
@@ -312,6 +314,13 @@ function Profile() {
   );
 }
 
-Profile.layout = Admin;
+Klasifikasi.layout = Admin;
 
-export default Profile;
+export async function getServerSideProps() {
+  const statistic = await fetchJson(`http://localhost:3000/api/statistics`);
+  return {
+    props: { statistic }, // will be passed to the page component as props
+  };
+}
+
+export default Klasifikasi;
