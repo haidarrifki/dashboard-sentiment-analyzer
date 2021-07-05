@@ -6,7 +6,7 @@ var routes = [
     layout: '/admin',
   },
   {
-    path: '/datasets',
+    path: '/datasets?page=1&size=10',
     name: 'Dataset',
     icon: 'ni ni-folder-17 text-blue',
     layout: '/admin',

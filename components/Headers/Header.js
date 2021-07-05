@@ -3,7 +3,12 @@ import React from 'react';
 import { Card, CardBody, CardTitle, Container, Row, Col } from 'reactstrap';
 
 function Header({ data }) {
-  console.log(data);
+  const formatRupiah = (numb) => {
+    const format = numb.toString().split('').reverse().join('');
+    const convert = format.match(/\d{1,3}/g);
+    const rupiah = convert.join('.').split('').reverse().join('');
+    return rupiah;
+  };
   return (
     <>
       <div className="header bg-gradient-dark pb-8 pt-5 pt-md-8">
@@ -23,7 +28,7 @@ function Header({ data }) {
                           Total Dataset
                         </CardTitle>
                         <span className="h2 font-weight-bold mb-0">
-                          {data.totalDataset}
+                          {formatRupiah(data.totalDataset)}
                         </span>
                       </div>
                       <Col className="col-auto">
@@ -47,7 +52,7 @@ function Header({ data }) {
                           Total Text Processing
                         </CardTitle>
                         <span className="h2 font-weight-bold mb-0">
-                          {data.totalTextProcessed}
+                          {formatRupiah(data.totalTextProcessed)}
                         </span>
                       </div>
                       <Col className="col-auto">
@@ -71,7 +76,7 @@ function Header({ data }) {
                           Total Klasifikasi
                         </CardTitle>
                         <span className="h2 font-weight-bold mb-0">
-                          {data.totalClassification}
+                          {formatRupiah(data.totalClassification)}
                         </span>
                       </div>
                       <Col className="col-auto">
