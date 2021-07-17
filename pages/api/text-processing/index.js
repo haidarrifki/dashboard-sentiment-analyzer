@@ -8,7 +8,7 @@ export default withSession(async (req, res) => {
     const { page, size } = req.query;
     const { limit, offset } = getPagination(page, size);
     const datasets = await db
-      .collection('text_processings')
+      .collection('datasets')
       .find()
       .limit(limit)
       .skip(offset)
