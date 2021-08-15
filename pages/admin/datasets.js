@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
-// react component that copies the given text inside your clipboard
-import { CopyToClipboard } from 'react-copy-to-clipboard';
+import React, { useEffect, useState, useRef } from 'react';
+import Link from 'next/link';
 // reactstrap components
 import {
   Button,
@@ -9,15 +8,10 @@ import {
   ModalFooter,
   Card,
   CardHeader,
-  CardBody,
   Container,
   Row,
-  Col,
   Table,
-  Progress,
-  Media,
   Badge,
-  UncontrolledTooltip,
   UncontrolledDropdown,
   DropdownToggle,
   Pagination,
@@ -26,6 +20,7 @@ import {
   DropdownMenu,
   DropdownItem,
   CardFooter,
+  Form,
 } from 'reactstrap';
 // layout for this page
 import Admin from 'layouts/Admin.js';
@@ -43,11 +38,24 @@ const Datasets = (props) => {
   const currentQuery = router.query;
   currentQuery.page = currentQuery.page ? parseInt(currentQuery.page) : 1;
   currentQuery.size = currentQuery.size ? parseInt(currentQuery.size) : 10;
+  const refreshData = () => {
+    router.replace(router.asPath);
+  };
 
+  const [file, setFile] = useState(null);
+  const fileUploadRef = useRef(null);
   // Loading process
   const [isLoading, setLoading] = useState(false);
+  const [isLoadingImport, setLoadingImport] = useState(false);
   const startLoading = () => setLoading(true);
   const stopLoading = () => setLoading(false);
+  // Modal
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const [modalData, setModalData] = React.useState(null);
+  const openModal = (index) => {
+    setModalData(props.datasets[index]);
+    setModalOpen(!modalOpen);
+  };
 
   useEffect(() => {
     Router.events.on('routeChangeStart', startLoading);
@@ -69,93 +77,130 @@ const Datasets = (props) => {
     });
   };
 
+  const uploadToClient = (event) => {
+    setFile(null);
+    if (event.target.files && event.target.files[0]) {
+      const i = event.target.files[0];
+
+      setFile(i);
+    }
+  };
+
+  const uploadToServer = async (event) => {
+    event.preventDefault();
+    if (!file) {
+      return alert('file belum dipilih');
+    }
+    setLoadingImport(true);
+    const body = new FormData();
+    body.append('file', file);
+    await fetchJson('/api/datasets/import', {
+      method: 'POST',
+      body,
+    });
+    setLoadingImport(false);
+    refreshData();
+    setFile(null);
+    fileUploadRef.current.value = '';
+    alert('Import datasets success');
+  };
+
   let content;
   if (isLoading) {
     content = (
       <tbody>
-        <td colspan="3">
-          <div class="spinner-border" role="status">
-            <span class="sr-only">Loading...</span>
-          </div>
-        </td>
-        ;
+        <tr>
+          <td colSpan="3">
+            <div className="spinner-border" role="status">
+              <span className="sr-only">Loading data...</span>
+            </div>
+          </td>
+        </tr>
       </tbody>
     );
   } else {
-    content = (
-      <tbody>
-        {props.datasets.map((dataset, index) => (
-          <tr key={index}>
-            {/* <td>{index + 1}</td> */}
-            <td>{cutText(dataset.review)}</td>
-            <td>
-              {dataset.label === 'pos' ? (
-                <Badge color="success">Positif</Badge>
-              ) : (
-                [
-                  dataset.label === 'neg' ? (
-                    <Badge color="danger">Negatif</Badge>
-                  ) : (
-                    <Badge color="primary">Unsupervised</Badge>
-                  ),
-                ]
-              )}
-            </td>
-            <td className="text-right">
-              <UncontrolledDropdown>
-                <DropdownToggle
-                  className="btn-icon-only text-light"
-                  role="button"
-                  size="sm"
-                  color=""
-                  onClick={(e) => e.preventDefault()}
-                >
-                  <i className="fas fa-ellipsis-v" />
-                </DropdownToggle>
-                <DropdownMenu className="dropdown-menu-arrow" right>
-                  <DropdownItem onClick={() => openModal(index)}>
-                    Detail
-                  </DropdownItem>
-                </DropdownMenu>
-              </UncontrolledDropdown>
+    content =
+      props.datasets.length > 0 ? (
+        <tbody>
+          {props.datasets.map((dataset, index) => (
+            <tr key={dataset._id}>
+              {/* <td>{index + 1}</td> */}
+              <td>{cutText(dataset.review)}</td>
+              <td>
+                {dataset.label === 'pos' ? (
+                  <Badge key={dataset._id} color="success">
+                    Positif
+                  </Badge>
+                ) : (
+                  [
+                    dataset.label === 'neg' ? (
+                      <Badge key={dataset._id} color="danger">
+                        Negatif
+                      </Badge>
+                    ) : (
+                      <Badge key={dataset._id} color="primary">
+                        Unsupervised
+                      </Badge>
+                    ),
+                  ]
+                )}
+              </td>
+              <td className="text-right">
+                <UncontrolledDropdown>
+                  <DropdownToggle
+                    className="btn-icon-only text-light"
+                    role="button"
+                    size="sm"
+                    color=""
+                    onClick={(e) => e.preventDefault()}
+                  >
+                    <i className="fas fa-ellipsis-v" />
+                  </DropdownToggle>
+                  <DropdownMenu className="dropdown-menu-arrow" right>
+                    <DropdownItem onClick={() => openModal(index)}>
+                      Detail
+                    </DropdownItem>
+                  </DropdownMenu>
+                </UncontrolledDropdown>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      ) : (
+        <tbody>
+          <tr>
+            <td colSpan="3" align="center">
+              No data.
             </td>
           </tr>
-        ))}
-      </tbody>
-    );
+        </tbody>
+      );
   }
 
-  // Modal
-  const [modalOpen, setModalOpen] = React.useState(false);
-  const [modalData, setModalData] = React.useState({});
-  const openModal = (index) => {
-    setModalData(props.datasets[index]);
-    setModalOpen(!modalOpen);
-  };
   let modalContent;
   if (modalData) {
     modalContent = (
       <ModalBody>
         <h3>Data</h3>
         <p>
-          <Badge color="default" pill>
+          <Badge key={modalData._id} color="default" pill>
             {modalData.type}
           </Badge>
         </p>
         <h3>Label</h3>
         <p>
           {modalData.label === 'pos' ? (
-            <Badge color="success" pill>
+            <Badge key={modalData._id} color="success" pill>
               Positif
             </Badge>
           ) : (
             [
               modalData.label === 'neg' ? (
-                <Badge color="danger" pill>
+                <Badge key={modalData._id} color="danger" pill>
                   Negatif
                 </Badge>
               ) : (
-                <Badge color="primary" pill>
+                <Badge key={modalData._id} color="primary" pill>
                   Unsupervised
                 </Badge>
               ),
@@ -167,6 +212,7 @@ const Datasets = (props) => {
       </ModalBody>
     );
   }
+
   return (
     <>
       <Header data={props.statistic} />
@@ -177,7 +223,51 @@ const Datasets = (props) => {
           <div className="col">
             <Card className="shadow">
               <CardHeader className="bg-transparent">
-                <h3 className="mb-0">List Dataset</h3>
+                <div className="row align-items-center">
+                  <div className="col">
+                    <h3 className="mb-0">List Dataset</h3>
+                  </div>
+                  <div className="col text-right">
+                    <Form>
+                      <div className="custom-file">
+                        <input
+                          lang="en"
+                          type="file"
+                          onChange={uploadToClient}
+                          ref={fileUploadRef}
+                          accept=".csv, .xls, .xlsx, text/csv, application/csv,
+                            text/comma-separated-values, application/csv, application/excel,
+                            application/vnd.msexcel, text/anytext, application/vnd. ms-excel,
+                            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                        />
+                        <Button
+                          color="primary"
+                          size="sm"
+                          onClick={uploadToServer}
+                          disabled={isLoadingImport}
+                        >
+                          {isLoadingImport ? (
+                            <span
+                              className="spinner-border spinner-border-sm"
+                              role="status"
+                              aria-hidden="true"
+                            ></span>
+                          ) : (
+                            'Import'
+                          )}
+                        </Button>
+                        <Button
+                          color="success"
+                          size="sm"
+                          href="/sample_dataset.csv"
+                          download
+                        >
+                          Download sample
+                        </Button>
+                      </div>
+                    </Form>
+                  </div>
+                </div>
               </CardHeader>
               <Table className="align-items-center table-flush" responsive>
                 <thead className="thead-light">
@@ -189,44 +279,6 @@ const Datasets = (props) => {
                   </tr>
                 </thead>
                 {content}
-                {/* <tbody>
-                  <tr>
-                    <td>1</td>
-                    <td>Coba</td>
-                    <td>
-                      <Badge color="success">Positive</Badge>
-                      <Badge color="danger">Negative</Badge>
-                    </td>
-                    <td className="text-right">
-                      <UncontrolledDropdown>
-                        <DropdownToggle
-                          className="btn-icon-only text-light"
-                          href="#pablo"
-                          role="button"
-                          size="sm"
-                          color=""
-                          onClick={(e) => e.preventDefault()}
-                        >
-                          <i className="fas fa-ellipsis-v" />
-                        </DropdownToggle>
-                        <DropdownMenu className="dropdown-menu-arrow" right>
-                          <DropdownItem
-                            href="#pablo"
-                            onClick={(e) => e.preventDefault()}
-                          >
-                            Edit
-                          </DropdownItem>
-                          <DropdownItem
-                            href="#pablo"
-                            onClick={(e) => e.preventDefault()}
-                          >
-                            Delete
-                          </DropdownItem>
-                        </DropdownMenu>
-                      </UncontrolledDropdown>
-                    </td>
-                  </tr>
-                </tbody> */}
               </Table>
               <CardFooter className="py-4">
                 <nav aria-label="...">

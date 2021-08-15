@@ -3,12 +3,12 @@ import getPagination from '../../../lib/pagination';
 import { connectToDatabase } from '../../../db/mongodb';
 
 export default withSession(async (req, res) => {
-  const { db } = await connectToDatabase();
   try {
+    const { db } = await connectToDatabase();
     const { page, size } = req.query;
     const { limit, offset } = getPagination(page, size);
     const datasets = await db
-      .collection('text_processings')
+      .collection('datasets')
       .find()
       .limit(limit)
       .skip(offset)

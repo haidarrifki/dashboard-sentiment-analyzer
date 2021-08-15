@@ -31,6 +31,7 @@
     "chart.js": "2.9.4",
     "classnames": "2.2.6",
     "csv-parser": "^3.0.0",
+    "formidable": "^1.2.2",
     "moment": "2.29.1",
     "mongodb": "^3.6.9",
     "next": "10.0.6",

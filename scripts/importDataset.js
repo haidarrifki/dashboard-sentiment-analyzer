@@ -35,6 +35,19 @@ const readDataset = () => {
 const importDataset = async (results) => {
   const { db } = await connectToDatabase();
   await db.collection('datasets').insertMany(results);
+  for (const result of results) {
+    const payload = {
+      before: result.review,
+      after: '',
+      type: result.type,
+      label: result.label,
+    };
+
+    console.log('>>> Insert:');
+    console.log(payload);
+    console.log('');
+    await db.collection('text_processings').insertOne(payload);
+  }
   console.log(results);
   process.exit(0);
 };

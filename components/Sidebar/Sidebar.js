@@ -47,7 +47,7 @@ function Sidebar(props) {
   const [collapseOpen, setCollapseOpen] = React.useState(false);
   // verifies if routeName is the one active (in browser input)
   const activeRoute = (routeName) => {
-    return router.route.indexOf(routeName) > -1;
+    return routeName.includes(router.route);
   };
   // toggles collapse between opened and closed (true/false)
   const toggleCollapse = () => {

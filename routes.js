@@ -12,7 +12,7 @@ var routes = [
     layout: '/admin',
   },
   {
-    path: '/text-processing',
+    path: '/text-processing?page=1&size=10',
     name: 'Text Processing',
     icon: 'ni ni-single-copy-04 text-orange',
     layout: '/admin',
