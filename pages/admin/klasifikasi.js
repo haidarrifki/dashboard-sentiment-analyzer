@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 // reactstrap components
 import {
   Button,
@@ -19,7 +19,6 @@ import {
   DropdownMenu,
   DropdownItem,
   CardFooter,
-  Form,
 } from 'reactstrap';
 // layout for this page
 import Admin from 'layouts/Admin.js';
@@ -37,9 +36,6 @@ const Klasifikasi = (props) => {
   const currentQuery = router.query;
   currentQuery.page = currentQuery.page ? parseInt(currentQuery.page) : 1;
   currentQuery.size = currentQuery.size ? parseInt(currentQuery.size) : 10;
-  const refreshData = () => {
-    router.replace(router.asPath);
-  };
 
   // Loading process
   const [isLoading, setLoading] = useState(false);
