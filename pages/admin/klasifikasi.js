@@ -1,325 +1,299 @@
-import React from "react";
-
+import React, { useEffect, useState, useRef } from 'react';
 // reactstrap components
 import {
   Button,
+  Modal,
+  ModalBody,
+  ModalFooter,
   Card,
   CardHeader,
-  CardBody,
-  FormGroup,
-  Form,
-  Input,
   Container,
   Row,
-  Col,
-} from "reactstrap";
+  Table,
+  Badge,
+  UncontrolledDropdown,
+  DropdownToggle,
+  Pagination,
+  PaginationItem,
+  PaginationLink,
+  DropdownMenu,
+  DropdownItem,
+  CardFooter,
+  Form,
+} from 'reactstrap';
 // layout for this page
-import Admin from "layouts/Admin.js";
+import Admin from 'layouts/Admin.js';
 // core components
-import UserHeader from "components/Headers/UserHeader.js";
+import Header from 'components/Headers/Header.js';
 
 import fetchJson from '../../lib/fetchJson';
+import cutText from '../../lib/cutText';
+import Router, { useRouter } from 'next/router';
 
-function Klasifikasi(props) {
+const Klasifikasi = (props) => {
+  // Router
+  const router = useRouter();
+  const currentPath = router.pathname;
+  const currentQuery = router.query;
+  currentQuery.page = currentQuery.page ? parseInt(currentQuery.page) : 1;
+  currentQuery.size = currentQuery.size ? parseInt(currentQuery.size) : 10;
+  const refreshData = () => {
+    router.replace(router.asPath);
+  };
+
+  // Loading process
+  const [isLoading, setLoading] = useState(false);
+  const startLoading = () => setLoading(true);
+  const stopLoading = () => setLoading(false);
+  // Modal
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const [modalData, setModalData] = React.useState(null);
+  const openModal = (index) => {
+    setModalData(props.classifications[index]);
+    setModalOpen(!modalOpen);
+  };
+
+  useEffect(() => {
+    Router.events.on('routeChangeStart', startLoading);
+    Router.events.on('routeChangeComplete', stopLoading);
+
+    return () => {
+      Router.events.off('routeChangeStart', startLoading);
+      Router.events.off('routeChangeComplete', stopLoading);
+    };
+  }, []);
+
+  const paginationHandler = (page, size) => {
+    currentQuery.page = page;
+    currentQuery.size = size;
+
+    router.push({
+      pathname: currentPath,
+      query: currentQuery,
+    });
+  };
+
+  let content;
+  if (isLoading) {
+    content = (
+      <tbody>
+        <tr>
+          <td colSpan="3">
+            <div className="spinner-border" role="status">
+              <span className="sr-only">Loading data...</span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    );
+  } else {
+    content =
+      props.classifications.length > 0 ? (
+        <tbody>
+          {props.classifications.map((dataset, index) => (
+            <tr key={dataset._id}>
+              {/* <td>{index + 1}</td> */}
+              <td>{cutText(dataset.review)}</td>
+              <td>
+                {dataset.label === 'pos' ? (
+                  <Badge key={dataset._id} color="success">
+                    Positif
+                  </Badge>
+                ) : (
+                  [
+                    dataset.label === 'neg' ? (
+                      <Badge key={dataset._id} color="danger">
+                        Negatif
+                      </Badge>
+                    ) : (
+                      <Badge key={dataset._id} color="primary">
+                        Unsupervised
+                      </Badge>
+                    ),
+                  ]
+                )}
+              </td>
+              <td className="text-right">
+                <UncontrolledDropdown>
+                  <DropdownToggle
+                    className="btn-icon-only text-light"
+                    role="button"
+                    size="sm"
+                    color=""
+                    onClick={(e) => e.preventDefault()}
+                  >
+                    <i className="fas fa-ellipsis-v" />
+                  </DropdownToggle>
+                  <DropdownMenu className="dropdown-menu-arrow" right>
+                    <DropdownItem onClick={() => openModal(index)}>
+                      Detail
+                    </DropdownItem>
+                  </DropdownMenu>
+                </UncontrolledDropdown>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      ) : (
+        <tbody>
+          <tr>
+            <td colSpan="3" align="center">
+              No data.
+            </td>
+          </tr>
+        </tbody>
+      );
+  }
+
+  let modalContent;
+  if (modalData) {
+    modalContent = (
+      <ModalBody>
+        <h3>Data</h3>
+        <p>
+          <Badge key={modalData._id} color="default" pill>
+            {modalData.type}
+          </Badge>
+        </p>
+        <h3>Label</h3>
+        <p>
+          {modalData.label === 'pos' ? (
+            <Badge key={modalData._id} color="success" pill>
+              Positif
+            </Badge>
+          ) : (
+            [
+              modalData.label === 'neg' ? (
+                <Badge key={modalData._id} color="danger" pill>
+                  Negatif
+                </Badge>
+              ) : (
+                <Badge key={modalData._id} color="primary" pill>
+                  Unsupervised
+                </Badge>
+              ),
+            ]
+          )}
+        </p>
+        <h3>Teks</h3>
+        <p>{modalData.review}</p>
+      </ModalBody>
+    );
+  }
+
   return (
     <>
-      <UserHeader />
+      <Header data={props.statistic} />
       {/* Page content */}
       <Container className="mt--7" fluid>
+        {/* Table */}
         <Row>
-          <Col className="order-xl-2 mb-5 mb-xl-0" xl="4">
-            <Card className="card-profile shadow">
-              <Row className="justify-content-center">
-                <Col className="order-lg-2" lg="3">
-                  <div className="card-profile-image">
-                    <a href="#pablo" onClick={(e) => e.preventDefault()}>
-                      <img
-                        alt="..."
-                        className="rounded-circle"
-                        src={require("assets/img/theme/team-4-800x800.jpg")}
-                      />
-                    </a>
-                  </div>
-                </Col>
-              </Row>
-              <CardHeader className="text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
-                <div className="d-flex justify-content-between">
-                  <Button
-                    className="mr-4"
-                    color="info"
-                    href="#pablo"
-                    onClick={(e) => e.preventDefault()}
-                    size="sm"
-                  >
-                    Connect
-                  </Button>
-                  <Button
-                    className="float-right"
-                    color="default"
-                    href="#pablo"
-                    onClick={(e) => e.preventDefault()}
-                    size="sm"
-                  >
-                    Message
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardBody className="pt-0 pt-md-4">
-                <Row>
+          <div className="col">
+            <Card className="shadow">
+              <CardHeader className="bg-transparent">
+                <div className="row align-items-center">
                   <div className="col">
-                    <div className="card-profile-stats d-flex justify-content-center mt-md-5">
-                      <div>
-                        <span className="heading">22</span>
-                        <span className="description">Friends</span>
-                      </div>
-                      <div>
-                        <span className="heading">10</span>
-                        <span className="description">Photos</span>
-                      </div>
-                      <div>
-                        <span className="heading">89</span>
-                        <span className="description">Comments</span>
-                      </div>
-                    </div>
+                    <h3 className="mb-0">List Klasifikasi</h3>
                   </div>
-                </Row>
-                <div className="text-center">
-                  <h3>
-                    Jessica Jones
-                    <span className="font-weight-light">, 27</span>
-                  </h3>
-                  <div className="h5 font-weight-300">
-                    <i className="ni location_pin mr-2" />
-                    Bucharest, Romania
-                  </div>
-                  <div className="h5 mt-4">
-                    <i className="ni business_briefcase-24 mr-2" />
-                    Solution Manager - Creative Tim Officer
-                  </div>
-                  <div>
-                    <i className="ni education_hat mr-2" />
-                    University of Computer Science
-                  </div>
-                  <hr className="my-4" />
-                  <p>
-                    Ryan — the name taken by Melbourne-raised, Brooklyn-based
-                    Nick Murphy — writes, performs and records all of his own
-                    music.
-                  </p>
-                  <a href="#pablo" onClick={(e) => e.preventDefault()}>
-                    Show more
-                  </a>
                 </div>
-              </CardBody>
-            </Card>
-          </Col>
-          <Col className="order-xl-1" xl="8">
-            <Card className="bg-secondary shadow">
-              <CardHeader className="bg-white border-0">
-                <Row className="align-items-center">
-                  <Col xs="8">
-                    <h3 className="mb-0">My account</h3>
-                  </Col>
-                  <Col className="text-right" xs="4">
-                    <Button
-                      color="primary"
-                      href="#pablo"
-                      onClick={(e) => e.preventDefault()}
-                      size="sm"
-                    >
-                      Settings
-                    </Button>
-                  </Col>
-                </Row>
               </CardHeader>
-              <CardBody>
-                <Form>
-                  <h6 className="heading-small text-muted mb-4">
-                    User information
-                  </h6>
-                  <div className="pl-lg-4">
-                    <Row>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-username"
-                          >
-                            Username
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            defaultValue="lucky.jesse"
-                            id="input-username"
-                            placeholder="Username"
-                            type="text"
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-email"
-                          >
-                            Email address
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            id="input-email"
-                            placeholder="jesse@example.com"
-                            type="email"
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-first-name"
-                          >
-                            First name
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            defaultValue="Lucky"
-                            id="input-first-name"
-                            placeholder="First name"
-                            type="text"
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-last-name"
-                          >
-                            Last name
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            defaultValue="Jesse"
-                            id="input-last-name"
-                            placeholder="Last name"
-                            type="text"
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                  </div>
-                  <hr className="my-4" />
-                  {/* Address */}
-                  <h6 className="heading-small text-muted mb-4">
-                    Contact information
-                  </h6>
-                  <div className="pl-lg-4">
-                    <Row>
-                      <Col md="12">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-address"
-                          >
-                            Address
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            defaultValue="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09"
-                            id="input-address"
-                            placeholder="Home Address"
-                            type="text"
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col lg="4">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-city"
-                          >
-                            City
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            defaultValue="New York"
-                            id="input-city"
-                            placeholder="City"
-                            type="text"
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col lg="4">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-country"
-                          >
-                            Country
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            defaultValue="United States"
-                            id="input-country"
-                            placeholder="Country"
-                            type="text"
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col lg="4">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-country"
-                          >
-                            Postal code
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            id="input-postal-code"
-                            placeholder="Postal code"
-                            type="number"
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                  </div>
-                  <hr className="my-4" />
-                  {/* Description */}
-                  <h6 className="heading-small text-muted mb-4">About me</h6>
-                  <div className="pl-lg-4">
-                    <FormGroup>
-                      <label>About Me</label>
-                      <Input
-                        className="form-control-alternative"
-                        placeholder="A few words about you ..."
-                        rows="4"
-                        defaultValue="A beautiful Dashboard for Bootstrap 4. It is Free and
-                          Open Source."
-                        type="textarea"
-                      />
-                    </FormGroup>
-                  </div>
-                </Form>
-              </CardBody>
+              <Table className="align-items-center table-flush" responsive>
+                <thead className="thead-light">
+                  <tr>
+                    {/* <th scope="col">No</th> */}
+                    <th scope="col">Teks</th>
+                    <th scope="col">Sentimen</th>
+                    <th scope="col" />
+                  </tr>
+                </thead>
+                {content}
+              </Table>
+              <CardFooter className="py-4">
+                <nav aria-label="...">
+                  <Pagination
+                    className="pagination justify-content-end mb-0"
+                    listClassName="justify-content-end mb-0"
+                  >
+                    <PaginationItem
+                      className={currentQuery.page === 1 ? 'disabled' : ''}
+                    >
+                      <PaginationLink
+                        onClick={() =>
+                          paginationHandler(
+                            currentQuery.page - 1,
+                            currentQuery.size
+                          )
+                        }
+                        tabIndex="-1"
+                      >
+                        <i className="fas fa-angle-left" />
+                        <span className="sr-only">Previous</span>
+                      </PaginationLink>
+                    </PaginationItem>
+                    <PaginationItem>
+                      <PaginationLink
+                        onClick={() =>
+                          paginationHandler(
+                            currentQuery.page + 1,
+                            currentQuery.size
+                          )
+                        }
+                      >
+                        <i className="fas fa-angle-right" />
+                        <span className="sr-only">Next</span>
+                      </PaginationLink>
+                    </PaginationItem>
+                  </Pagination>
+                </nav>
+              </CardFooter>
             </Card>
-          </Col>
+          </div>
         </Row>
+        <Modal
+          toggle={() => setModalOpen(!modalOpen)}
+          isOpen={modalOpen}
+          centered={true}
+          size="lg"
+        >
+          <div className=" modal-header">
+            <h5 className=" modal-title" id="exampleModalLabel">
+              Detail Dataset
+            </h5>
+            <button
+              aria-label="Close"
+              className=" close"
+              type="button"
+              onClick={() => setModalOpen(!modalOpen)}
+            >
+              <span aria-hidden={true}>×</span>
+            </button>
+          </div>
+          {modalContent}
+          <ModalFooter>
+            <Button
+              color="secondary"
+              type="button"
+              onClick={() => setModalOpen(!modalOpen)}
+            >
+              Close
+            </Button>
+          </ModalFooter>
+        </Modal>
       </Container>
     </>
   );
-}
+};
 
 Klasifikasi.layout = Admin;
 
-export async function getServerSideProps() {
+export async function getServerSideProps({ params, query, ...props }) {
   const statistic = await fetchJson(`http://localhost:3000/api/statistics`);
+
+  const classifications = await fetchJson(
+    `http://localhost:3000/api/classifications?page=${query.page}&size=${query.size}`
+  );
   return {
-    props: { statistic }, // will be passed to the page component as props
+    props: { statistic, classifications, page: query.page, size: query.size }, // will be passed to the page component as props
   };
 }
 
