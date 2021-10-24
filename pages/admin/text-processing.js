@@ -70,10 +70,13 @@ function TextProcessing(props) {
     });
   };
 
-  const processText = (e) => {
+  const processText = async (e) => {
     e.preventDefault();
     if (!window.confirm('Lakukan pemrosesan text dari datasets?')) return;
-    console.log('Process Text!');
+    const data = await fetchJson('/api/text-processings');
+    console.log('>>> Data');
+    console.log(data);
+    // console.log('Process Text!');
   };
 
   let content;
