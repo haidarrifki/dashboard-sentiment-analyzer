@@ -40,8 +40,6 @@ function TextProcessing(props) {
 
   // Loading process
   const [isLoading, setLoading] = useState(false);
-  const startLoading = () => setLoading(true);
-  const stopLoading = () => setLoading(false);
   // Modal
   const [modalOpen, setModalOpen] = React.useState(false);
   const [modalData, setModalData] = React.useState(null);
@@ -51,6 +49,9 @@ function TextProcessing(props) {
   };
 
   useEffect(() => {
+    const startLoading = () => setLoading(true);
+    const stopLoading = () => setLoading(false);
+
     Router.events.on('routeChangeStart', startLoading);
     Router.events.on('routeChangeComplete', stopLoading);
 
@@ -73,10 +74,11 @@ function TextProcessing(props) {
   const processText = async (e) => {
     e.preventDefault();
     if (!window.confirm('Lakukan pemrosesan text dari datasets?')) return;
-    const data = await fetchJson('/api/text-processings');
-    console.log('>>> Data');
-    console.log(data);
-    // console.log('Process Text!');
+    setLoading(true);
+    await fetchJson('/api/text-processings/process', {
+      method: 'POST',
+    });
+    setLoading(false);
   };
 
   let content;
@@ -84,7 +86,7 @@ function TextProcessing(props) {
     content = (
       <tbody>
         <tr>
-          <td colSpan="4">
+          <td colSpan="4" style={{ textAlign: 'center' }}>
             <div className="spinner-border" role="status">
               <span className="sr-only">Loading...</span>
             </div>
@@ -99,8 +101,8 @@ function TextProcessing(props) {
           {props.textProcessings.map((dataset, index) => (
             <tr key={dataset._id}>
               {/* <td>{index + 1}</td> */}
-              <td>{cutText(dataset.before, 'textProcessing')}</td>
-              <td>{cutText(dataset.after, 'textProcessing')}</td>
+              <td>{cutText(dataset.text, 'textProcessing')}</td>
+              <td>{cutText(dataset.textProcessed, 'textProcessing')}</td>
               <td>
                 {dataset.label === 'pos' ? (
                   <Badge key={dataset._id} color="success">

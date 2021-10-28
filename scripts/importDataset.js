@@ -18,16 +18,17 @@ async function connectToDatabase() {
 
 const readDataset = () => {
   const results = [];
-  createReadStream('./imdb_master.csv')
+  createReadStream('./imdb_dataset.csv')
     .pipe(csv())
-    .on('data', (data) =>
+    .on('data', (data) => {
       results.push({
-        type: data.type,
+        type: 'test',
         review: data.review,
-        label: data.label,
+        label: data.sentiment === 'positive' ? 'pos' : 'neg',
       })
-    )
+    })
     .on('end', () => {
+      // console.log(results);
       importDataset(results);
     });
 };
@@ -37,9 +38,9 @@ const importDataset = async (results) => {
   await db.collection('datasets').insertMany(results);
   for (const result of results) {
     const payload = {
-      before: result.review,
-      after: '',
-      type: result.type,
+      text: result.review,
+      textProcessed: '',
+      type: 'test',
       label: result.label,
     };
 

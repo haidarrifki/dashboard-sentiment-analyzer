@@ -6,10 +6,10 @@ export default withSession(async (req, res) => {
   try {
     const totalDataset = await db.collection('datasets').countDocuments();
     const totalTextProcessed = await db
-      .collection('datasetsProcessed')
-      .countDocuments();
+      .collection('datasets')
+      .countDocuments({ after: { $ne: '' } });
     const totalClassification = await db
-      .collection('datasetsClassification')
+      .collection('classifications')
       .countDocuments();
 
     return res

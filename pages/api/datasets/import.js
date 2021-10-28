@@ -31,8 +31,8 @@ const importDataset = async (results) => {
   await db.collection('datasets').insertMany(results);
   for (const result of results) {
     const payload = {
-      before: result.review,
-      after: '',
+      text: result.review,
+      textProcessed: '',
       type: result.type,
       label: result.label,
     };

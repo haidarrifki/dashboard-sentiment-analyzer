@@ -91,13 +91,13 @@ const Klasifikasi = (props) => {
               {/* <td>{index + 1}</td> */}
               <td>{cutText(dataset.review)}</td>
               <td>
-                {dataset.label === 'pos' ? (
+                {dataset.sentiment === 1 ? (
                   <Badge key={dataset._id} color="success">
                     Positif
                   </Badge>
                 ) : (
                   [
-                    dataset.label === 'neg' ? (
+                    dataset.sentiment === 0 ? (
                       <Badge key={dataset._id} color="danger">
                         Negatif
                       </Badge>
@@ -153,13 +153,13 @@ const Klasifikasi = (props) => {
         </p>
         <h3>Label</h3>
         <p>
-          {modalData.label === 'pos' ? (
+          {modalData.sentiment === 1 ? (
             <Badge key={modalData._id} color="success" pill>
               Positif
             </Badge>
           ) : (
             [
-              modalData.label === 'neg' ? (
+              modalData.sentiment === 0 ? (
                 <Badge key={modalData._id} color="danger" pill>
                   Negatif
                 </Badge>
