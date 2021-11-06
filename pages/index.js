@@ -3,7 +3,8 @@ import Router from 'next/router';
 
 export default function Index() {
   React.useEffect(() => {
-    Router.push('/auth/login');
+    Router.push('/klasifikasi');
+    // Router.push('/auth/login');
   });
 
   return <div />;
