@@ -19,11 +19,14 @@ function Auth(props) {
             <div className="header-body text-center mb-7">
               <Row className="justify-content-center">
                 <Col lg="6" md="6">
-                  <h1 className="text-white">Selamat Datang!</h1>
-                  <p className="text-lead text-light">
+                  <h1 className="text-white">
                     Analisis Sentimen Review Film Menggunakan Algoritma Naïve
                     Bayes.
-                  </p>
+                  </h1>
+                  {/* <p className="text-lead text-light">
+                    Analisis Sentimen Review Film Menggunakan Algoritma Naïve
+                    Bayes.
+                  </p> */}
                 </Col>
               </Row>
             </div>

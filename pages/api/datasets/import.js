@@ -61,7 +61,6 @@ export default withSession(async (req, res) => {
         return res.status(201).json({ error: false, message: 'success' });
       });
     } catch (error) {
-      console.log(error);
       return res.status(500).json({ message: 'Something went wrong.', error });
     }
   }

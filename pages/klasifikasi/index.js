@@ -7,6 +7,7 @@ import fetchJson from '../../lib/fetchJson';
 
 // reactstrap components
 import {
+  Alert,
   Button,
   Card,
   CardBody,
@@ -17,12 +18,16 @@ import {
   InputGroupText,
   InputGroup,
   Col,
+  Table,
 } from 'reactstrap';
 
 // layout for this page
 import Auth from 'layouts/Classification.js';
 
 function Klasifikasi() {
+  const [result, setResult] = useState(true);
+  const [resultColor, setResultColor] = useState('dark');
+  const [response, setResponse] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
@@ -43,7 +48,16 @@ function Klasifikasi() {
       body: JSON.stringify({ text }),
     });
 
-    enqueueSnackbar('Teks berhasil diproses.', {
+    if (response.classifyResult === 'positive') {
+      setResultColor('success');
+    } else {
+      setResultColor('danger');
+    }
+
+    setResponse(response);
+    setResult(true);
+
+    enqueueSnackbar('Teks berhasil diproses', {
       variant: 'success',
     });
 
@@ -53,6 +67,34 @@ function Klasifikasi() {
   return (
     <>
       <Col lg="7" md="7">
+        {response ? (
+          <>
+            <div>
+              <Alert color={resultColor} isOpen={result}>
+                <h1 className="alert-heading text-center">
+                  Sentiment {response.classifyResult}
+                </h1>
+              </Alert>
+            </div>
+            <Table bordered>
+              <thead className="thead-light">
+                <tr>
+                  <th>Label</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody style={{ backgroundColor: '#fff' }}>
+                {response.classification.map((data, index) => (
+                  <tr key={index}>
+                    {Object.values(data).map((val, index) => (
+                      <td key={index}>{val}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </>
+        ) : null}
         <Card className="bg-secondary shadow border-0">
           <CardBody className="px-lg-5 py-lg-5">
             {/* <div className="text-center text-muted mb-4">

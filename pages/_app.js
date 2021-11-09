@@ -50,7 +50,7 @@ export default class MyApp extends App {
               name="viewport"
               content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1"
             />
-            <title>Dashboard Analisis Sentimen</title>
+            <title>Analisis Sentimen</title>
           </Head>
           <Layout>
             <Component {...pageProps} />
