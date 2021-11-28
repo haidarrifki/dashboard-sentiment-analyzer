@@ -46,7 +46,6 @@ export default withSession(async (req, res) => {
       return await getListClassification(req, res);
     case 'POST':
       return await classifier(req, res);
-      break;
     default:
       return res.status(405).end(`Method ${req.method} Not Allowed`);
   }

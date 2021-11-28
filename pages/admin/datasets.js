@@ -126,13 +126,13 @@ const Datasets = (props) => {
               {/* <td>{index + 1}</td> */}
               <td>{cutText(dataset.review)}</td>
               <td>
-                {dataset.label === 'pos' ? (
+                {dataset.label === 'positive' ? (
                   <Badge key={dataset._id} color="success">
                     Positif
                   </Badge>
                 ) : (
                   [
-                    dataset.label === 'neg' ? (
+                    dataset.label === 'negative' ? (
                       <Badge key={dataset._id} color="danger">
                         Negatif
                       </Badge>
@@ -273,6 +273,7 @@ const Datasets = (props) => {
                   <tr>
                     {/* <th scope="col">No</th> */}
                     <th scope="col">Teks</th>
+                    <th scope="col">Probabilitas</th>
                     <th scope="col">Sentimen</th>
                     <th scope="col" />
                   </tr>
