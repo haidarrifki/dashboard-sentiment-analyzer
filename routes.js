@@ -18,6 +18,12 @@ var routes = [
     layout: '/admin',
   },
   {
+    path: '/pembobotan?page=1&size=10',
+    name: 'Pembobotan & Seleksi Fitur',
+    icon: 'ni ni-chart-bar-32 text-green',
+    layout: '/admin',
+  },
+  {
     path: '/klasifikasi?page=1&size=10',
     name: 'Klasifikasi',
     icon: 'ni ni-tag text-yellow',
