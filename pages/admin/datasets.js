@@ -54,7 +54,7 @@ const Datasets = (props) => {
       });
       setDatasets(datasets);
     };
-    setTimeout(fetchData, 3000);
+    setTimeout(fetchData, 2500);
   };
   // Notistack
   const { enqueueSnackbar } = useSnackbar();
