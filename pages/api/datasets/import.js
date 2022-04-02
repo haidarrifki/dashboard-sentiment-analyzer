@@ -19,10 +19,7 @@ const readDataset = (file) => {
     .on('data', (data) =>
       results.push({
         review: data.review,
-        label: data.sentiment,
-        // type: data.type,
-        // review: data.review,
-        // label: data.label,
+        sentiment: data.sentiment,
       })
     )
     .on('end', () => {
@@ -31,40 +28,39 @@ const readDataset = (file) => {
 };
 
 const importDataset = async (results) => {
-  const classifier = new natural.BayesClassifier();
+  // const classifier = new natural.BayesClassifier();
+  // 1. koneksi ke database
   const { db } = await connectToDatabase();
+  // 2. insert data dari excel ke database collection datasets
   await db.collection('datasets').insertMany(results);
-  for (const result of results) {
-    const payload = {
-      text: result.review,
-      textProcessed: '',
-      // type: result.sentiment,
-      label: result.label,
-    };
+  // for (const result of results) {
+  //   const payload = {
+  //     text: result.review,
+  //     textProcessed: '',
+  //     label: result.sentiment,
+  //   };
 
-    await db.collection('text_processings').insertOne(payload);
-    // natural classifier training
-    classifier.addDocument(result.review, result.label);
-  }
-  await train(classifier);
-  console.log('>>> Return results');
-  console.log(results);
+  //   await db.collection('text_processings').insertOne(payload);
+  //   // natural classifier training
+  //   classifier.addDocument(result.review, result.sentiment);
+  // }
+  // await train(classifier);
   return results;
 };
 
-const train = async (classifier) => {
-  console.log('>>> Train script executed!');
-  const datasetLocation = resolve(
-    process.cwd(),
-    'pages/api/datasets/dataset.json'
-  );
-  classifier.train();
-  classifier.save(datasetLocation, (err, file) => {
-    if (err) throw err;
-    console.log(file);
-    return file;
-  });
-};
+// const train = async (classifier) => {
+//   console.log('>>> Train script executed!');
+//   const datasetLocation = resolve(
+//     process.cwd(),
+//     'pages/api/datasets/dataset.json'
+//   );
+//   classifier.train();
+//   classifier.save(datasetLocation, (err, file) => {
+//     if (err) throw err;
+//     console.log(file);
+//     return file;
+//   });
+// };
 
 const saveFile = async (file) => {
   try {

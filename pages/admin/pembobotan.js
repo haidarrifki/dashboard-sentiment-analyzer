@@ -24,7 +24,7 @@ import {
 // layout for this page
 import Admin from 'layouts/Admin.js';
 // core components
-import Header from 'components/Headers/Header.js';
+import Header from 'components/Headers/HeaderTable.js';
 
 import fetchJson from '../../lib/fetchJson';
 import cutText from '../../lib/cutText';
@@ -168,7 +168,7 @@ const Pembobotan = (props) => {
 
   return (
     <>
-      <Header data={props.statistic} />
+      <Header />
       {/* Page content */}
       <Container className="mt--7" fluid>
         {/* Table */}
@@ -272,14 +272,12 @@ const Pembobotan = (props) => {
 
 Pembobotan.layout = Admin;
 
-export async function getServerSideProps({ params, query, ...props }) {
-  const statistic = await fetchJson(`http://localhost:3000/api/statistics`);
-
+export async function getServerSideProps({ query }) {
   const datasets = await fetchJson(
     `http://localhost:3000/api/pembobotan?page=${query.page}&size=${query.size}`
   );
   return {
-    props: { statistic, datasets, page: query.page, size: query.size }, // will be passed to the page component as props
+    props: { datasets, page: query.page, size: query.size }, // will be passed to the page component as props
   };
 }
 

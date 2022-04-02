@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useSnackbar } from 'notistack';
 // reactstrap components
 import {
   Button,
@@ -24,7 +25,7 @@ import {
 // layout for this page
 import Admin from 'layouts/Admin.js';
 // core components
-import Header from 'components/Headers/Header.js';
+import Header from 'components/Headers/HeaderTable.js';
 
 import fetchJson from '../../lib/fetchJson';
 import cutText from '../../lib/cutText';
@@ -37,10 +38,27 @@ const Datasets = (props) => {
   const currentQuery = router.query;
   currentQuery.page = currentQuery.page ? parseInt(currentQuery.page) : 1;
   currentQuery.size = currentQuery.size ? parseInt(currentQuery.size) : 10;
+  // Data
+  const [datasets, setDatasets] = useState(props.datasets);
   const refreshData = () => {
-    router.replace(router.asPath);
+    // router.replace(router.asPath);
+    const fetchData = async () => {
+      const datasets = await fetchJson(
+        `http://localhost:3000/api/datasets?page=${currentQuery.page}&size=${currentQuery.size}`
+      );
+      setLoadingImport(false);
+      setFile(null);
+      fileUploadRef.current.value = '';
+      enqueueSnackbar('Import datasets success', {
+        variant: 'success',
+      });
+      setDatasets(datasets);
+    };
+    setTimeout(fetchData, 3000);
   };
-
+  // Notistack
+  const { enqueueSnackbar } = useSnackbar();
+  // Files
   const [file, setFile] = useState(null);
   const fileUploadRef = useRef(null);
   // Loading process
@@ -52,7 +70,7 @@ const Datasets = (props) => {
   const [modalOpen, setModalOpen] = React.useState(false);
   const [modalData, setModalData] = React.useState(null);
   const openModal = (index) => {
-    setModalData(props.datasets[index]);
+    setModalData(datasets[index]);
     setModalOpen(!modalOpen);
   };
 
@@ -80,7 +98,6 @@ const Datasets = (props) => {
     setFile(null);
     if (event.target.files && event.target.files[0]) {
       const i = event.target.files[0];
-
       setFile(i);
     }
   };
@@ -97,11 +114,7 @@ const Datasets = (props) => {
       method: 'POST',
       body,
     });
-    setLoadingImport(false);
     refreshData();
-    setFile(null);
-    fileUploadRef.current.value = '';
-    alert('Import datasets success');
   };
 
   let content;
@@ -119,20 +132,20 @@ const Datasets = (props) => {
     );
   } else {
     content =
-      props.datasets.length > 0 ? (
+      datasets.length > 0 ? (
         <tbody>
-          {props.datasets.map((dataset, index) => (
+          {datasets.map((dataset, index) => (
             <tr key={dataset._id}>
               {/* <td>{index + 1}</td> */}
               <td>{cutText(dataset.review)}</td>
               <td>
-                {dataset.label === 'positive' ? (
+                {dataset.sentiment === 'positive' ? (
                   <Badge key={dataset._id} color="success">
                     Positif
                   </Badge>
                 ) : (
                   [
-                    dataset.label === 'negative' ? (
+                    dataset.sentiment === 'negative' ? (
                       <Badge key={dataset._id} color="danger">
                         Negatif
                       </Badge>
@@ -180,21 +193,21 @@ const Datasets = (props) => {
   if (modalData) {
     modalContent = (
       <ModalBody>
-        <h3>Data</h3>
+        {/* <h3>Data</h3>
         <p>
           <Badge key={modalData._id} color="default" pill>
             {modalData.type}
           </Badge>
-        </p>
+        </p> */}
         <h3>Label</h3>
         <p>
-          {modalData.label === 'pos' ? (
+          {modalData.sentiment === 'positive' ? (
             <Badge key={modalData._id} color="success" pill>
               Positif
             </Badge>
           ) : (
             [
-              modalData.label === 'neg' ? (
+              modalData.sentiment === 'negative' ? (
                 <Badge key={modalData._id} color="danger" pill>
                   Negatif
                 </Badge>
@@ -214,7 +227,7 @@ const Datasets = (props) => {
 
   return (
     <>
-      <Header data={props.statistic} />
+      <Header />
       {/* Page content */}
       <Container className="mt--7" fluid>
         {/* Table */}
@@ -243,7 +256,7 @@ const Datasets = (props) => {
                           color="primary"
                           size="sm"
                           onClick={uploadToServer}
-                          disabled={isLoadingImport}
+                          disabled={isLoadingImport || !file}
                         >
                           {isLoadingImport ? (
                             <span
@@ -271,9 +284,7 @@ const Datasets = (props) => {
               <Table className="align-items-center table-flush" responsive>
                 <thead className="thead-light">
                   <tr>
-                    {/* <th scope="col">No</th> */}
                     <th scope="col">Teks</th>
-                    <th scope="col">Probabilitas</th>
                     <th scope="col">Sentimen</th>
                     <th scope="col" />
                   </tr>
@@ -358,14 +369,12 @@ const Datasets = (props) => {
 
 Datasets.layout = Admin;
 
-export async function getServerSideProps({ params, query, ...props }) {
-  const statistic = await fetchJson(`http://localhost:3000/api/statistics`);
-
+export async function getServerSideProps({ query }) {
   const datasets = await fetchJson(
     `http://localhost:3000/api/datasets?page=${query.page}&size=${query.size}`
   );
   return {
-    props: { statistic, datasets, page: query.page, size: query.size }, // will be passed to the page component as props
+    props: { datasets, page: query.page, size: query.size }, // will be passed to the page component as props
   };
 }
 
