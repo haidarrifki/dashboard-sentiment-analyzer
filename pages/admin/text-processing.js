@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-
+import { useSnackbar } from 'notistack';
 // reactstrap components
 import {
   Button,
@@ -37,7 +37,33 @@ function TextProcessing(props) {
   const currentQuery = router.query;
   currentQuery.page = currentQuery.page ? parseInt(currentQuery.page) : 1;
   currentQuery.size = currentQuery.size ? parseInt(currentQuery.size) : 10;
-
+  // Notistack
+  const { enqueueSnackbar } = useSnackbar();
+  // Data
+  const [textProcessings, setTextProcessings] = useState(props.textProcessings);
+  const refreshData = () => {
+    // router.replace(router.asPath);
+    const fetchData = async () => {
+      try {
+        const textProcessings = await fetchJson(
+          `http://localhost:3000/api/text-processings?page=${currentQuery.page}&size=${currentQuery.size}`
+        );
+        enqueueSnackbar('Text preprocessing from datasets success', {
+          variant: 'success',
+        });
+        setLoading(false);
+        setTextProcessings(textProcessings);
+      } catch (error) {
+        console.log(error);
+        enqueueSnackbar('Something went wrong', {
+          variant: 'error',
+        });
+        setLoading(false);
+      }
+    };
+    fetchData();
+    // setTimeout(fetchData, 2000);
+  };
   // Loading process
   const [isLoading, setLoading] = useState(false);
   // Modal
@@ -75,10 +101,18 @@ function TextProcessing(props) {
     e.preventDefault();
     if (!window.confirm('Lakukan pemrosesan text dari datasets?')) return;
     setLoading(true);
-    await fetchJson('/api/text-processings/process', {
-      method: 'POST',
-    });
-    setLoading(false);
+    try {
+      await fetchJson('/api/text-processings/process', {
+        method: 'POST',
+      });
+      refreshData();
+    } catch (error) {
+      console.log(error);
+      enqueueSnackbar('Something went wrong', {
+        variant: 'error',
+      });
+      setLoading(false);
+    }
   };
 
   let content;
@@ -96,21 +130,21 @@ function TextProcessing(props) {
     );
   } else {
     content =
-      props.textProcessings.length > 0 ? (
+      textProcessings.length > 0 ? (
         <tbody>
-          {props.textProcessings.map((dataset, index) => (
+          {textProcessings.map((dataset, index) => (
             <tr key={dataset._id}>
               {/* <td>{index + 1}</td> */}
-              <td>{cutText(dataset.text, 'textProcessing')}</td>
+              <td>{cutText(dataset.review, 'textProcessing')}</td>
               <td>{cutText(dataset.textProcessed, 'textProcessing')}</td>
               <td>
-                {dataset.label === 'pos' ? (
+                {dataset.sentiment === 'positive' ? (
                   <Badge key={dataset._id} color="success">
                     Positif
                   </Badge>
                 ) : (
                   [
-                    dataset.label === 'neg' ? (
+                    dataset.sentiment === 'negative' ? (
                       <Badge key={dataset._id} color="danger">
                         Negatif
                       </Badge>
@@ -158,21 +192,15 @@ function TextProcessing(props) {
   if (modalData) {
     modalContent = (
       <ModalBody>
-        <h3>Data</h3>
-        <p>
-          <Badge key={modalData._id} color="default" pill>
-            {modalData.type}
-          </Badge>
-        </p>
         <h3>Label</h3>
         <p>
-          {modalData.label === 'pos' ? (
+          {modalData.label === 'positive' ? (
             <Badge key={modalData._id} color="success" pill>
               Positif
             </Badge>
           ) : (
             [
-              modalData.label === 'neg' ? (
+              modalData.label === 'negative' ? (
                 <Badge key={modalData._id} color="danger" pill>
                   Negatif
                 </Badge>
@@ -185,7 +213,9 @@ function TextProcessing(props) {
           )}
         </p>
         <h3>Teks</h3>
-        <p>{modalData.review}</p>
+        <p>{modalData.text}</p>
+        <h3>Hasil Preprocess</h3>
+        <p>{modalData.textProcessed}</p>
       </ModalBody>
     );
   }
@@ -204,8 +234,13 @@ function TextProcessing(props) {
                     <h3 className="mb-0">List Text Processing</h3>
                   </div>
                   <div className="col text-right">
-                    <Button color="primary" size="sm" onClick={processText}>
-                      Process Text
+                    <Button
+                      color="primary"
+                      size="sm"
+                      onClick={processText}
+                      disabled={isLoading}
+                    >
+                      Proses Dataset
                     </Button>
                   </div>
                 </div>
