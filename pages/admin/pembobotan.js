@@ -52,7 +52,7 @@ const Pembobotan = (props) => {
   const [modalOpen, setModalOpen] = React.useState(false);
   const [modalData, setModalData] = React.useState(null);
   const openModal = (index) => {
-    setModalData(props.datasets[index]);
+    setModalData(props.terms[index]);
     setModalOpen(!modalOpen);
   };
 
@@ -91,13 +91,14 @@ const Pembobotan = (props) => {
     );
   } else {
     content =
-      props.datasets.length > 0 ? (
+      props.terms.length > 0 ? (
         <tbody>
-          {props.datasets.map((dataset, index) => (
+          {props.terms.map((dataset, index) => (
             <tr key={dataset._id}>
               {/* <td>{index + 1}</td> */}
-              <td>{cutText(dataset.review)}</td>
-              <td>
+              <td>{cutText(dataset.word)}</td>
+              <td>{parseFloat(dataset.tfidf)}</td>
+              {/* <td>
                 {dataset.label === 'positive' ? (
                   <Badge key={dataset._id} color="success">
                     Positif
@@ -115,7 +116,7 @@ const Pembobotan = (props) => {
                     ),
                   ]
                 )}
-              </td>
+              </td> */}
             </tr>
           ))}
         </tbody>
@@ -187,7 +188,7 @@ const Pembobotan = (props) => {
                   <tr>
                     {/* <th scope="col">No</th> */}
                     <th scope="col">Term (Kata)</th>
-                    <th scope="col">DF</th>
+                    {/* <th scope="col">DF</th> */}
                     <th scope="col">IDF</th>
                     {/* <th scope="col" /> */}
                   </tr>
@@ -273,11 +274,12 @@ const Pembobotan = (props) => {
 Pembobotan.layout = Admin;
 
 export async function getServerSideProps({ query }) {
-  const datasets = await fetchJson(
-    `http://localhost:3000/api/pembobotan?page=${query.page}&size=${query.size}`
+  const terms = await fetchJson(
+    `http://localhost:3000/api/terms?page=${query.page}&size=${query.size}`
   );
+
   return {
-    props: { datasets, page: query.page, size: query.size }, // will be passed to the page component as props
+    props: { terms, page: query.page, size: query.size }, // will be passed to the page component as props
   };
 }
 

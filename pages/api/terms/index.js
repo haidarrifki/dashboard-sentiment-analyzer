@@ -7,15 +7,14 @@ export default withSession(async (req, res) => {
     const { db } = await connectToDatabase();
     const { page, size } = req.query;
     const { limit, offset } = getPagination(page, size);
-    const weights = await db
-      .collection('weight')
+    const terms = await db
+      .collection('terms')
       .find()
       .limit(limit)
       .skip(offset)
-      .sort({ _id: -1 })
       .toArray();
 
-    return res.status(200).json(weights);
+    return res.status(200).json(terms);
   } catch (error) {
     return res.status(500).json({ message: 'Something went wrong.', error });
   }
