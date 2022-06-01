@@ -143,6 +143,7 @@ const Pembobotan = (props) => {
             <tr key={dataset._id}>
               {/* <td>{index + 1}</td> */}
               <td>{cutText(dataset.word)}</td>
+              <td>{parseFloat(dataset.df)}</td>
               <td>{parseFloat(dataset.tfidf)}</td>
             </tr>
           ))}
@@ -241,7 +242,7 @@ const Pembobotan = (props) => {
                   <tr>
                     {/* <th scope="col">No</th> */}
                     <th scope="col">Term (Kata)</th>
-                    {/* <th scope="col">DF</th> */}
+                    <th scope="col">DF</th>
                     <th scope="col">IDF</th>
                     {/* <th scope="col" /> */}
                   </tr>
