@@ -5,16 +5,16 @@ export default withSession(async (req, res) => {
   const { db } = await connectToDatabase();
   try {
     const totalDataset = await db.collection('datasets').countDocuments();
-    const totalTextProcessed = await db
-      .collection('datasets')
-      .countDocuments({ after: { $ne: '' } });
+    const totalTerms = await db
+      .collection('terms')
+      .countDocuments();
     const totalClassification = await db
       .collection('classifications')
       .countDocuments();
 
     return res
       .status(200)
-      .json({ totalDataset, totalTextProcessed, totalClassification });
+      .json({ totalDataset, totalTerms, totalClassification });
   } catch (error) {
     return res.status(500).json({ message: 'Something went wrong.', error });
   }

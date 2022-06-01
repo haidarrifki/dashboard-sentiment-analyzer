@@ -64,6 +64,7 @@ const Datasets = (props) => {
   // Loading process
   const [isLoading, setLoading] = useState(false);
   const [isLoadingImport, setLoadingImport] = useState(false);
+  const [isLoadingClear, setLoadingClear] = useState(false);
   const startLoading = () => setLoading(true);
   const stopLoading = () => setLoading(false);
   // Modal
@@ -115,6 +116,29 @@ const Datasets = (props) => {
       body,
     });
     refreshData();
+  };
+
+  const clearDatasets = async (event) => {
+    event.preventDefault();
+    const text =
+      'Data yang dihapus akan hilang dan tidak bisa dikembalikan. Apakah anda yakin?';
+    if (!window.confirm(text)) return;
+    setLoadingClear(true);
+    try {
+      await fetchJson('/api/datasets/clear', {
+        method: 'DELETE',
+      });
+    } catch (error) {
+      console.log(error);
+      enqueueSnackbar('Something went wrong', {
+        variant: 'error',
+      });
+    }
+    setLoadingClear(false);
+    enqueueSnackbar('Clear datasets success', {
+      variant: 'success',
+    });
+    setDatasets([]);
   };
 
   let content;
@@ -275,6 +299,22 @@ const Datasets = (props) => {
                           download
                         >
                           Download sample
+                        </Button>
+                        <Button
+                          color="danger"
+                          size="sm"
+                          onClick={clearDatasets}
+                          disabled={isLoadingClear || datasets.length < 1}
+                        >
+                          {isLoadingClear ? (
+                            <span
+                              className="spinner-border spinner-border-sm"
+                              role="status"
+                              aria-hidden="true"
+                            ></span>
+                          ) : (
+                            'Clear Datasets'
+                          )}
                         </Button>
                       </div>
                     </Form>

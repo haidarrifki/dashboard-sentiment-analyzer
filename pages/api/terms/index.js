@@ -12,6 +12,7 @@ export default withSession(async (req, res) => {
       .find()
       .limit(limit)
       .skip(offset)
+      .sort({ tfidf: -1 })
       .toArray();
 
     return res.status(200).json(terms);

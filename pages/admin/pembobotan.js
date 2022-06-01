@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSnackbar } from 'notistack';
 // reactstrap components
 import {
   Button,
@@ -11,15 +12,15 @@ import {
   Row,
   Table,
   Badge,
-  UncontrolledDropdown,
-  DropdownToggle,
+  // UncontrolledDropdown,
+  // DropdownToggle,
   Pagination,
   PaginationItem,
   PaginationLink,
-  DropdownMenu,
-  DropdownItem,
+  // DropdownMenu,
+  // DropdownItem,
   CardFooter,
-  Form,
+  // Form,
 } from 'reactstrap';
 // layout for this page
 import Admin from 'layouts/Admin.js';
@@ -40,21 +41,24 @@ const Pembobotan = (props) => {
   const refreshData = () => {
     router.replace(router.asPath);
   };
+  // Notistack
+  const { enqueueSnackbar } = useSnackbar();
 
-  const [file, setFile] = useState(null);
-  const fileUploadRef = useRef(null);
+  // const [file, setFile] = useState(null);
+  // const fileUploadRef = useRef(null);
   // Loading process
   const [isLoading, setLoading] = useState(false);
-  const [isLoadingImport, setLoadingImport] = useState(false);
+  const [isLoadingClear, setLoadingClear] = useState(false);
+  // const [isLoadingImport, setLoadingImport] = useState(false);
   const startLoading = () => setLoading(true);
   const stopLoading = () => setLoading(false);
   // Modal
   const [modalOpen, setModalOpen] = React.useState(false);
   const [modalData, setModalData] = React.useState(null);
-  const openModal = (index) => {
-    setModalData(props.terms[index]);
-    setModalOpen(!modalOpen);
-  };
+  // const openModal = (index) => {
+  //   setModalData(props.terms[index]);
+  //   setModalOpen(!modalOpen);
+  // };
 
   useEffect(() => {
     Router.events.on('routeChangeStart', startLoading);
@@ -76,12 +80,54 @@ const Pembobotan = (props) => {
     });
   };
 
+  const processTerm = async (e) => {
+    e.preventDefault();
+    if (!window.confirm('Lakukan pemrosesan perhitungan pembobotan tfidf?'))
+      return;
+    setLoading(true);
+    try {
+      await fetchJson('/api/terms/process', {
+        method: 'POST',
+      });
+      refreshData();
+    } catch (error) {
+      console.log(error);
+      enqueueSnackbar('Something went wrong', {
+        variant: 'error',
+      });
+      setLoading(false);
+    }
+  };
+
+  const clearTerms = async (event) => {
+    event.preventDefault();
+    const text =
+      'Data yang dihapus akan hilang dan tidak bisa dikembalikan. Apakah anda yakin?';
+    if (!window.confirm(text)) return;
+    setLoadingClear(true);
+    try {
+      await fetchJson('/api/terms/clear', {
+        method: 'DELETE',
+      });
+    } catch (error) {
+      console.log(error);
+      enqueueSnackbar('Something went wrong', {
+        variant: 'error',
+      });
+    }
+    setLoadingClear(false);
+    enqueueSnackbar('Clear terms list success', {
+      variant: 'success',
+    });
+    refreshData();
+  };
+
   let content;
   if (isLoading) {
     content = (
       <tbody>
         <tr>
-          <td colSpan="3">
+          <td colSpan="2" style={{ textAlign: 'center' }}>
             <div className="spinner-border" role="status">
               <span className="sr-only">Loading data...</span>
             </div>
@@ -98,32 +144,13 @@ const Pembobotan = (props) => {
               {/* <td>{index + 1}</td> */}
               <td>{cutText(dataset.word)}</td>
               <td>{parseFloat(dataset.tfidf)}</td>
-              {/* <td>
-                {dataset.label === 'positive' ? (
-                  <Badge key={dataset._id} color="success">
-                    Positif
-                  </Badge>
-                ) : (
-                  [
-                    dataset.label === 'negative' ? (
-                      <Badge key={dataset._id} color="danger">
-                        Negatif
-                      </Badge>
-                    ) : (
-                      <Badge key={dataset._id} color="primary">
-                        Unsupervised
-                      </Badge>
-                    ),
-                  ]
-                )}
-              </td> */}
             </tr>
           ))}
         </tbody>
       ) : (
         <tbody>
           <tr>
-            <td colSpan="3" align="center">
+            <td colSpan="2" align="center">
               No data.
             </td>
           </tr>
@@ -180,6 +207,32 @@ const Pembobotan = (props) => {
                 <div className="row align-items-center">
                   <div className="col">
                     <h3 className="mb-0">Data Pembobotan</h3>
+                  </div>
+                  <div className="col text-right">
+                    <Button
+                      color="primary"
+                      size="sm"
+                      onClick={processTerm}
+                      disabled={isLoading || props.terms.length > 0}
+                    >
+                      Proses Pembobotan
+                    </Button>
+                    <Button
+                      color="danger"
+                      size="sm"
+                      onClick={clearTerms}
+                      disabled={isLoadingClear || props.terms.length < 1}
+                    >
+                      {isLoadingClear ? (
+                        <span
+                          className="spinner-border spinner-border-sm"
+                          role="status"
+                          aria-hidden="true"
+                        ></span>
+                      ) : (
+                        'Clear Terms'
+                      )}
+                    </Button>
                   </div>
                 </div>
               </CardHeader>

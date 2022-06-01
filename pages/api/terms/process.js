@@ -11,13 +11,13 @@ export default withSession(async (req, res) => {
     const collections = await db.listCollections().toArray();
     // if the collection exist drop it
     for (let i = 0; i < collections.length; i++) {
-      if (collections[i].name === 'text_processings') {
-        await db.collection('text_processings').drop();
+      if (collections[i].name === 'terms') {
+        await db.collection('terms').drop();
       }
     }
     const execute = util.promisify(exec);
     // execute python
-    const cmd = `python3 /home/harfi/skripsi/movie-review-sentiment/text_processing.py`;
+    const cmd = `python3 /home/harfi/skripsi/movie-review-sentiment/tfidf.py`;
     const { stdout, stderr } = await execute(cmd);
     if (stderr) throw stderr;
 

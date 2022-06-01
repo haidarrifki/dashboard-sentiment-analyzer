@@ -66,6 +66,7 @@ function TextProcessing(props) {
   };
   // Loading process
   const [isLoading, setLoading] = useState(false);
+  const [isLoadingClear, setLoadingClear] = useState(false);
   // Modal
   const [modalOpen, setModalOpen] = React.useState(false);
   const [modalData, setModalData] = React.useState(null);
@@ -112,6 +113,32 @@ function TextProcessing(props) {
         variant: 'error',
       });
       setLoading(false);
+    }
+  };
+
+  const clearDatasets = async (event) => {
+    event.preventDefault();
+    const text =
+      'Data yang dihapus akan hilang dan tidak bisa dikembalikan. Apakah anda yakin?';
+    if (confirm(text) == true) {
+      setLoadingClear(true);
+      try {
+        await fetchJson('/api/text-processings/clear', {
+          method: 'DELETE',
+        });
+      } catch (error) {
+        console.log(error);
+        enqueueSnackbar('Something went wrong', {
+          variant: 'error',
+        });
+      }
+      setLoadingClear(false);
+      enqueueSnackbar('Clear text processings list success', {
+        variant: 'success',
+      });
+      setTextProcessings([]);
+    } else {
+      return;
     }
   };
 
@@ -194,13 +221,13 @@ function TextProcessing(props) {
       <ModalBody>
         <h3>Label</h3>
         <p>
-          {modalData.label === 'positive' ? (
+          {modalData.sentiment === 'positive' ? (
             <Badge key={modalData._id} color="success" pill>
               Positif
             </Badge>
           ) : (
             [
-              modalData.label === 'negative' ? (
+              modalData.sentiment === 'negative' ? (
                 <Badge key={modalData._id} color="danger" pill>
                   Negatif
                 </Badge>
@@ -213,7 +240,7 @@ function TextProcessing(props) {
           )}
         </p>
         <h3>Teks</h3>
-        <p>{modalData.text}</p>
+        <p>{modalData.review}</p>
         <h3>Hasil Preprocess</h3>
         <p>{modalData.textProcessed}</p>
       </ModalBody>
@@ -238,9 +265,25 @@ function TextProcessing(props) {
                       color="primary"
                       size="sm"
                       onClick={processText}
-                      disabled={isLoading}
+                      disabled={isLoading || textProcessings.length > 0}
                     >
                       Proses Dataset
+                    </Button>
+                    <Button
+                      color="danger"
+                      size="sm"
+                      onClick={clearDatasets}
+                      disabled={isLoadingClear || textProcessings.length < 1}
+                    >
+                      {isLoadingClear ? (
+                        <span
+                          className="spinner-border spinner-border-sm"
+                          role="status"
+                          aria-hidden="true"
+                        ></span>
+                      ) : (
+                        'Clear Text Processings'
+                      )}
                     </Button>
                   </div>
                 </div>

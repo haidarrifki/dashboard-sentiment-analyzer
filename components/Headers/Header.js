@@ -49,10 +49,10 @@ function Header({ data }) {
                           tag="h5"
                           className="text-uppercase text-muted mb-0"
                         >
-                          Total Text Processing
+                          Total Terms
                         </CardTitle>
                         <span className="h2 font-weight-bold mb-0">
-                          {formatRupiah(data.totalTextProcessed)}
+                          {formatRupiah(data.totalTerms)}
                         </span>
                       </div>
                       <Col className="col-auto">
