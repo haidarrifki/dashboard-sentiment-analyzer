@@ -127,7 +127,7 @@ const Pembobotan = (props) => {
     content = (
       <tbody>
         <tr>
-          <td colSpan="2" style={{ textAlign: 'center' }}>
+          <td colSpan="3" style={{ textAlign: 'center' }}>
             <div className="spinner-border" role="status">
               <span className="sr-only">Loading data...</span>
             </div>
