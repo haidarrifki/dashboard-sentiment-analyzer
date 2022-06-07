@@ -177,7 +177,7 @@ function TextProcessing(props) {
                       </Badge>
                     ) : (
                       <Badge key={dataset._id} color="primary">
-                        Unsupervised
+                        Neutral
                       </Badge>
                     ),
                   ]
@@ -233,7 +233,7 @@ function TextProcessing(props) {
                 </Badge>
               ) : (
                 <Badge key={modalData._id} color="primary" pill>
-                  Unsupervised
+                  Neutral
                 </Badge>
               ),
             ]

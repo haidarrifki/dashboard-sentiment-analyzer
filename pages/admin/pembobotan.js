@@ -183,7 +183,7 @@ const Pembobotan = (props) => {
                 </Badge>
               ) : (
                 <Badge key={modalData._id} color="primary" pill>
-                  Unsupervised
+                  Neutral
                 </Badge>
               ),
             ]
