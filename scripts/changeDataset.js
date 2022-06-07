@@ -24,13 +24,13 @@ const deleteDataset = async () => {
       .collection('datasets_bak')
       .find({ sentiment: 'positive' })
       .sort({ _id: -1 })
-      .limit(2500)
+      .limit(2000)
       .toArray(),
     db
       .collection('datasets_bak')
       .find({ sentiment: 'negative' })
       .sort({ _id: -1 })
-      .limit(2500)
+      .limit(2000)
       .toArray(),
   ]);
   const datasetsPositiveData = datasetsPositive.map((dataset) => {

@@ -18,14 +18,14 @@ async function connectToDatabase() {
 
 const readDataset = () => {
   const results = [];
-  createReadStream('./imdb_dataset.csv')
+  createReadStream('./imdb_master.csv')
     .pipe(csv())
     .on('data', (data) => {
       results.push({
-        type: 'test',
+        type: data.type,
         review: data.review,
-        label: data.sentiment === 'positive' ? 'pos' : 'neg',
-      })
+        label: data.label,
+      });
     })
     .on('end', () => {
       // console.log(results);
@@ -35,21 +35,36 @@ const readDataset = () => {
 
 const importDataset = async (results) => {
   const { db } = await connectToDatabase();
-  await db.collection('datasets').insertMany(results);
-  for (const result of results) {
-    const payload = {
-      text: result.review,
-      textProcessed: '',
-      type: 'test',
-      label: result.label,
-    };
+  // await db.collection('datasets').insertMany(results);
+  const datasets = [];
+  for (let i = 0; i < results.length; i++) {
+    const result = results[i];
+    if (datasets.length == 1000) break;
+    if (result.type === 'train' && result.label === 'unsup') {
+      const payload = {
+        review: result.review,
+        sentiment: result.label,
+      };
 
-    console.log('>>> Insert:');
-    console.log(payload);
-    console.log('');
-    await db.collection('text_processings').insertOne(payload);
+      datasets.push(payload);
+    }
   }
-  console.log(results);
+  console.log(datasets);
+  await db.collection('datasets').insertMany(datasets);
+  // for (const result of results) {
+  //   const payload = {
+  //     text: result.review,
+  //     textProcessed: '',
+  //     type: 'test',
+  //     label: result.label,
+  //   };
+
+  //   console.log('>>> Insert:');
+  //   console.log(payload);
+  //   console.log('');
+  //   // await db.collection('text_processings').insertOne(payload);
+  // }
+  // console.log(results);
   process.exit(0);
 };
 
