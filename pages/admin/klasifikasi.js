@@ -69,6 +69,24 @@ const Klasifikasi = (props) => {
     });
   };
 
+  const processDataTesting = async (e) => {
+    e.preventDefault();
+    if (!window.confirm('Lakukan pemrosesan data uji?')) return;
+    setLoading(true);
+    try {
+      await fetchJson('/api/terms/process', {
+        method: 'POST',
+      });
+      refreshData();
+    } catch (error) {
+      console.log(error);
+      enqueueSnackbar('Something went wrong', {
+        variant: 'error',
+      });
+      setLoading(false);
+    }
+  };
+
   let content;
   if (isLoading) {
     content = (
@@ -89,15 +107,16 @@ const Klasifikasi = (props) => {
           {props.classifications.map((dataset, index) => (
             <tr key={dataset._id}>
               {/* <td>{index + 1}</td> */}
-              <td>{cutText(dataset.review)}</td>
+              <td>{cutText(dataset.review, 'textProcessing')}</td>
+              <td>{cutText(dataset.textProcessed, 'textProcessing')}</td>
               <td>
-                {dataset.sentiment === 1 ? (
+                {dataset.sentiment === 'positive' ? (
                   <Badge key={dataset._id} color="success">
                     Positif
                   </Badge>
                 ) : (
                   [
-                    dataset.sentiment === 0 ? (
+                    dataset.sentiment === 'negative' ? (
                       <Badge key={dataset._id} color="danger">
                         Negatif
                       </Badge>
@@ -145,21 +164,21 @@ const Klasifikasi = (props) => {
   if (modalData) {
     modalContent = (
       <ModalBody>
-        <h3>Data</h3>
+        {/* <h3>Data</h3>
         <p>
           <Badge key={modalData._id} color="default" pill>
             {modalData.type}
           </Badge>
-        </p>
+        </p> */}
         <h3>Label</h3>
         <p>
-          {modalData.sentiment === 1 ? (
+          {modalData.sentiment === 'positive' ? (
             <Badge key={modalData._id} color="success" pill>
               Positif
             </Badge>
           ) : (
             [
-              modalData.sentiment === 0 ? (
+              modalData.sentiment === 'negative' ? (
                 <Badge key={modalData._id} color="danger" pill>
                   Negatif
                 </Badge>
@@ -191,6 +210,16 @@ const Klasifikasi = (props) => {
                   <div className="col">
                     <h3 className="mb-0">List Klasifikasi</h3>
                   </div>
+                  <div className="col text-right">
+                    <Button
+                      color="primary"
+                      size="sm"
+                      onClick={processDataTesting}
+                      disabled={isLoading || props.classifications.length === 0}
+                    >
+                      Proses Data Uji
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
               <Table className="align-items-center table-flush" responsive>
@@ -198,6 +227,7 @@ const Klasifikasi = (props) => {
                   <tr>
                     {/* <th scope="col">No</th> */}
                     <th scope="col">Teks</th>
+                    <th scope="col">Hasil Preprocess</th>
                     <th scope="col">Sentimen</th>
                     <th scope="col" />
                   </tr>
@@ -284,7 +314,7 @@ Klasifikasi.layout = Admin;
 
 export async function getServerSideProps({ query }) {
   const classifications = await fetchJson(
-    `http://localhost:3000/api/classifications?page=${query.page}&size=${query.size}`
+    `http://localhost:3000/api/text-processings?page=${query.page}&size=${query.size}`
   );
   return {
     props: { classifications, page: query.page, size: query.size }, // will be passed to the page component as props
