@@ -19,7 +19,11 @@ import {
   PaginationLink,
   DropdownMenu,
   DropdownItem,
+  CardBody,
+  Form,
+  FormGroup,
   CardFooter,
+  Input,
 } from 'reactstrap';
 // layout for this page
 import Admin from 'layouts/Admin.js';
@@ -70,9 +74,29 @@ function TextProcessing(props) {
   // Modal
   const [modalOpen, setModalOpen] = React.useState(false);
   const [modalData, setModalData] = React.useState(null);
+  const [modalFormOpen, setModalFormOpen] = React.useState(false);
+  const [modalDataForm, setModalDataForm] = React.useState(null);
+
   const openModal = (index) => {
     setModalData(props.textProcessings[index]);
     setModalOpen(!modalOpen);
+  };
+
+  const openFormModal = async () => {
+    setModalFormOpen(!modalFormOpen);
+    try {
+      const data = await fetchJson('/api/settings');
+      console.log(data);
+      setModalDataForm(
+        `${data.settings.firstRatio}:${data.settings.secondRatio}`
+      );
+      console.log(modalDataForm);
+    } catch (error) {
+      console.log(error);
+      enqueueSnackbar('Something went wrong', {
+        variant: 'error',
+      });
+    }
   };
 
   useEffect(() => {
@@ -101,12 +125,27 @@ function TextProcessing(props) {
   const processText = async (e) => {
     e.preventDefault();
     if (!window.confirm('Lakukan pemrosesan text dari datasets?')) return;
+    setModalFormOpen(false);
     setLoading(true);
     try {
-      await fetchJson('/api/text-processings/process', {
+      const data = await fetchJson('/api/text-processings/process', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ratio: e.target.ratio.value,
+        }),
       });
-      refreshData();
+      console.log('>>> Data');
+      console.log(data);
+      if (data.status === false) {
+        enqueueSnackbar(data.message, {
+          variant: 'error',
+        });
+        setModalFormOpen(true);
+        setLoading(false);
+      } else {
+        refreshData();
+      }
     } catch (error) {
       console.log(error);
       enqueueSnackbar('Something went wrong', {
@@ -261,11 +300,19 @@ function TextProcessing(props) {
                     <h3 className="mb-0">List Text Processing</h3>
                   </div>
                   <div className="col text-right">
-                    <Button
+                    {/* <Button
                       color="primary"
                       size="sm"
                       onClick={processText}
                       disabled={isLoading || textProcessings.length > 0}
+                    >
+                      Proses Dataset
+                    </Button> */}
+                    <Button
+                      color="primary"
+                      size="sm"
+                      onClick={() => openFormModal()}
+                      disabled={isLoading}
                     >
                       Proses Dataset
                     </Button>
@@ -369,6 +416,40 @@ function TextProcessing(props) {
               Close
             </Button>
           </ModalFooter>
+        </Modal>
+
+        <Modal
+          toggle={() => setModalFormOpen(!modalFormOpen)}
+          isOpen={modalFormOpen}
+          centered={true}
+        >
+          <div className=" modal-body p-0">
+            <Card className=" bg-secondary shadow border-0">
+              <CardBody className=" px-lg-5 py-lg-5">
+                <Form role="form" onSubmit={processText}>
+                  <FormGroup>
+                    <label className=" form-control-label" htmlFor="ratio">
+                      Perbandingan Data
+                    </label>
+                    <Input
+                      name="ratio"
+                      defaultValue={modalDataForm}
+                      id="ratio"
+                      type="text"
+                      pattern="^[0-9][0-9]:[0-9][0-9]$"
+                      title="Contoh Format: 90:10"
+                      required
+                    ></Input>
+                  </FormGroup>
+                  <div className=" text-center">
+                    <Button className=" my-4" color="primary" type="submit">
+                      Proses
+                    </Button>
+                  </div>
+                </Form>
+              </CardBody>
+            </Card>
+          </div>
         </Modal>
       </Container>
     </>
