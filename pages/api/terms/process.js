@@ -7,17 +7,10 @@ export default withSession(async (req, res) => {
   try {
     // 1. clear collection first
     const { db } = await connectToDatabase();
-    // check collections first
-    const collections = await db.listCollections().toArray();
-    // if the collection exist drop it
-    for (let i = 0; i < collections.length; i++) {
-      if (collections[i].name === 'terms') {
-        await db.collection('terms').drop();
-      }
-    }
+    await db.collection('terms').deleteMany();
     const execute = util.promisify(exec);
     // execute python
-    const cmd = `python3 /home/harfi/skripsi/movie-review-sentiment/tfidf.py`;
+    const cmd = process.env.CMD_TERM;
     const { stdout, stderr } = await execute(cmd);
     if (stderr) throw stderr;
 

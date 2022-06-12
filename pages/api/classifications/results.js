@@ -6,7 +6,19 @@ export default withSession(async (req, res) => {
     const { db } = await connectToDatabase();
     const examination = await db
       .collection('examinations')
-      .findOne({}, {sort:{$natural:-1}});
+      .findOne({}, { sort: { $natural: -1 } });
+
+    console.log(examination);
+
+    if (!examination) {
+      return res.status(200).json({
+        accuracy: '0%',
+        true_positive: 0,
+        false_negative: 0,
+        false_positive: 0,
+        true_negative: 0,
+      });
+    }
 
     return res.status(200).json(examination);
   } catch (error) {

@@ -4,7 +4,13 @@ import { connectToDatabase } from '../../../db/mongodb';
 export default withSession(async (req, res) => {
   try {
     const { db } = await connectToDatabase();
-    await db.collection('datasets').deleteMany();
+    await Promise.all([
+      db.collection('datasets').deleteMany(),
+      db.collection('text_processings').deleteMany(),
+      db.collection('terms').deleteMany(),
+      db.collection('classifications').deleteMany(),
+      db.collection('examinations').deleteMany(),
+    ]);
 
     return res.status(200).json({ message: 'success.' });
   } catch (error) {

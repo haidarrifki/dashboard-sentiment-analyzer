@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useSnackbar } from 'notistack';
 // reactstrap components
 import {
   Button,
@@ -30,6 +31,7 @@ import cutText from '../../lib/cutText';
 import Router, { useRouter } from 'next/router';
 
 const Klasifikasi = (props) => {
+  const { enqueueSnackbar } = useSnackbar();
   // Router
   const router = useRouter();
   const currentPath = router.pathname;
@@ -74,10 +76,10 @@ const Klasifikasi = (props) => {
     if (!window.confirm('Lakukan pemrosesan data uji?')) return;
     setLoading(true);
     try {
-      await fetchJson('/api/terms/process', {
+      await fetchJson('/api/classifications/process', {
         method: 'POST',
       });
-      refreshData();
+      Router.push('/admin/pengujian');
     } catch (error) {
       console.log(error);
       enqueueSnackbar('Something went wrong', {
@@ -92,7 +94,7 @@ const Klasifikasi = (props) => {
     content = (
       <tbody>
         <tr>
-          <td colSpan="3">
+          <td colSpan="4" style={{ textAlign: 'center' }}>
             <div className="spinner-border" role="status">
               <span className="sr-only">Loading data...</span>
             </div>
@@ -152,7 +154,7 @@ const Klasifikasi = (props) => {
       ) : (
         <tbody>
           <tr>
-            <td colSpan="3" align="center">
+            <td colSpan="4" align="center">
               No data.
             </td>
           </tr>
@@ -314,7 +316,7 @@ Klasifikasi.layout = Admin;
 
 export async function getServerSideProps({ query }) {
   const classifications = await fetchJson(
-    `http://localhost:3000/api/text-processings?page=${query.page}&size=${query.size}`
+    `${process.env.BASE_URL}/api/classifications?page=${query.page}&size=${query.size}`
   );
   return {
     props: { classifications, page: query.page, size: query.size }, // will be passed to the page component as props

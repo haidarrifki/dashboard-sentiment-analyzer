@@ -44,7 +44,7 @@ const Datasets = (props) => {
     // router.replace(router.asPath);
     const fetchData = async () => {
       const datasets = await fetchJson(
-        `http://localhost:3000/api/datasets?page=${currentQuery.page}&size=${currentQuery.size}`
+        `/api/datasets?page=${currentQuery.page}&size=${currentQuery.size}`
       );
       setLoadingImport(false);
       setFile(null);
@@ -411,7 +411,7 @@ Datasets.layout = Admin;
 
 export async function getServerSideProps({ query }) {
   const datasets = await fetchJson(
-    `http://localhost:3000/api/datasets?page=${query.page}&size=${query.size}`
+    `${process.env.BASE_URL}/api/datasets?page=${query.page}&size=${query.size}`
   );
   return {
     props: { datasets, page: query.page, size: query.size }, // will be passed to the page component as props

@@ -73,7 +73,7 @@ function Header({ data }) {
                           tag="h5"
                           className="text-uppercase text-muted mb-0"
                         >
-                          Total Klasifikasi
+                          Total Data Uji
                         </CardTitle>
                         <span className="h2 font-weight-bold mb-0">
                           {formatRupiah(data.totalClassification)}
@@ -99,7 +99,9 @@ function Header({ data }) {
                         >
                           Akurasi
                         </CardTitle>
-                        <span className="h2 font-weight-bold mb-0">0%</span>
+                        <span className="h2 font-weight-bold mb-0">
+                          {data.accuracy ? data.accuracy : '0%'}
+                        </span>
                       </div>
                       <Col className="col-auto">
                         <div className="icon icon-shape bg-info text-white rounded-circle shadow">

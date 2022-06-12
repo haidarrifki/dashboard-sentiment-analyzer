@@ -50,7 +50,7 @@ function TextProcessing(props) {
     const fetchData = async () => {
       try {
         const textProcessings = await fetchJson(
-          `http://localhost:3000/api/text-processings?page=${currentQuery.page}&size=${currentQuery.size}`
+          `/api/text-processings?page=${currentQuery.page}&size=${currentQuery.size}`
         );
         enqueueSnackbar('Text preprocessing from datasets success', {
           variant: 'success',
@@ -86,11 +86,9 @@ function TextProcessing(props) {
     setModalFormOpen(!modalFormOpen);
     try {
       const data = await fetchJson('/api/settings');
-      console.log(data);
       setModalDataForm(
         `${data.settings.firstRatio}:${data.settings.secondRatio}`
       );
-      console.log(modalDataForm);
     } catch (error) {
       console.log(error);
       enqueueSnackbar('Something went wrong', {
@@ -135,8 +133,6 @@ function TextProcessing(props) {
           ratio: e.target.ratio.value,
         }),
       });
-      console.log('>>> Data');
-      console.log(data);
       if (data.status === false) {
         enqueueSnackbar(data.message, {
           variant: 'error',
@@ -155,31 +151,31 @@ function TextProcessing(props) {
     }
   };
 
-  const clearDatasets = async (event) => {
-    event.preventDefault();
-    const text =
-      'Data yang dihapus akan hilang dan tidak bisa dikembalikan. Apakah anda yakin?';
-    if (confirm(text) == true) {
-      setLoadingClear(true);
-      try {
-        await fetchJson('/api/text-processings/clear', {
-          method: 'DELETE',
-        });
-      } catch (error) {
-        console.log(error);
-        enqueueSnackbar('Something went wrong', {
-          variant: 'error',
-        });
-      }
-      setLoadingClear(false);
-      enqueueSnackbar('Clear text processings list success', {
-        variant: 'success',
-      });
-      setTextProcessings([]);
-    } else {
-      return;
-    }
-  };
+  // const clearDatasets = async (event) => {
+  //   event.preventDefault();
+  //   const text =
+  //     'Data yang dihapus akan hilang dan tidak bisa dikembalikan. Apakah anda yakin?';
+  //   if (confirm(text) == true) {
+  //     setLoadingClear(true);
+  //     try {
+  //       await fetchJson('/api/text-processings/clear', {
+  //         method: 'DELETE',
+  //       });
+  //     } catch (error) {
+  //       console.log(error);
+  //       enqueueSnackbar('Something went wrong', {
+  //         variant: 'error',
+  //       });
+  //     }
+  //     setLoadingClear(false);
+  //     enqueueSnackbar('Clear text processings list success', {
+  //       variant: 'success',
+  //     });
+  //     setTextProcessings([]);
+  //   } else {
+  //     return;
+  //   }
+  // };
 
   let content;
   if (isLoading) {
@@ -316,7 +312,7 @@ function TextProcessing(props) {
                     >
                       Proses Dataset
                     </Button>
-                    <Button
+                    {/* <Button
                       color="danger"
                       size="sm"
                       onClick={clearDatasets}
@@ -331,7 +327,7 @@ function TextProcessing(props) {
                       ) : (
                         'Clear Text Processings'
                       )}
-                    </Button>
+                    </Button> */}
                   </div>
                 </div>
               </CardHeader>
@@ -460,7 +456,7 @@ TextProcessing.layout = Admin;
 
 export async function getServerSideProps({ query }) {
   const textProcessings = await fetchJson(
-    `http://localhost:3000/api/text-processings?page=${query.page}&size=${query.size}`
+    `${process.env.BASE_URL}/api/text-processings?page=${query.page}&size=${query.size}`
   );
   return {
     props: { textProcessings, page: query.page, size: query.size }, // will be passed to the page component as props

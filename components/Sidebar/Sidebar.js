@@ -105,7 +105,7 @@ function Sidebar(props) {
           <span className="navbar-toggler-icon" />
         </button>
         {/* Brand */}
-        {logo && logo.innerLink ? (
+        {/* {logo && logo.innerLink ? (
           <Link href={logo.innerLink}>
             <span>{navbarBrand}</span>
           </Link>
@@ -114,7 +114,7 @@ function Sidebar(props) {
           <a href={logo.innerLink} target="_blank">
             {navbarBrand}
           </a>
-        ) : null}
+        ) : null} */}
         {/* User */}
         <Nav className="align-items-center d-md-none">
           <UncontrolledDropdown nav>
@@ -138,7 +138,7 @@ function Sidebar(props) {
           {/* Collapse header */}
           <div className="navbar-collapse-header d-md-none">
             <Row>
-              {logo ? (
+              {/* {logo ? (
                 <Col className="collapse-brand" xs="6">
                   {logo.innerLink ? (
                     <Link href={logo.innerLink}>
@@ -150,7 +150,7 @@ function Sidebar(props) {
                     </a>
                   )}
                 </Col>
-              ) : null}
+              ) : null} */}
               <Col className="collapse-close" xs="6">
                 <button
                   className="navbar-toggler"

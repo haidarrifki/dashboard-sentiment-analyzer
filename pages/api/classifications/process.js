@@ -7,7 +7,7 @@ export default withSession(async (req, res) => {
   try {
     const execute = util.promisify(exec);
     // execute python
-    const cmd = `python3 /home/harfi/skripsi/movie-review-sentiment/classification.py`;
+    const cmd = process.env.CMD_CLASSIFICATION;
     const { stdout, stderr } = await execute(cmd);
     if (stderr) throw stderr;
 

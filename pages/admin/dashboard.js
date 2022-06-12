@@ -98,7 +98,7 @@ const Dashboard = (props) => {
 Dashboard.layout = Admin;
 
 export async function getServerSideProps() {
-  const statistic = await fetchJson(`http://localhost:3000/api/statistics`);
+  const statistic = await fetchJson(`${process.env.BASE_URL}/api/statistics`);
   return {
     props: { statistic }, // will be passed to the page component as props
   };

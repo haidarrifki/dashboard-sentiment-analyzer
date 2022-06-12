@@ -99,28 +99,28 @@ const Pembobotan = (props) => {
     }
   };
 
-  const clearTerms = async (event) => {
-    event.preventDefault();
-    const text =
-      'Data yang dihapus akan hilang dan tidak bisa dikembalikan. Apakah anda yakin?';
-    if (!window.confirm(text)) return;
-    setLoadingClear(true);
-    try {
-      await fetchJson('/api/terms/clear', {
-        method: 'DELETE',
-      });
-    } catch (error) {
-      console.log(error);
-      enqueueSnackbar('Something went wrong', {
-        variant: 'error',
-      });
-    }
-    setLoadingClear(false);
-    enqueueSnackbar('Clear terms list success', {
-      variant: 'success',
-    });
-    refreshData();
-  };
+  // const clearTerms = async (event) => {
+  //   event.preventDefault();
+  //   const text =
+  //     'Data yang dihapus akan hilang dan tidak bisa dikembalikan. Apakah anda yakin?';
+  //   if (!window.confirm(text)) return;
+  //   setLoadingClear(true);
+  //   try {
+  //     await fetchJson('/api/terms/clear', {
+  //       method: 'DELETE',
+  //     });
+  //   } catch (error) {
+  //     console.log(error);
+  //     enqueueSnackbar('Something went wrong', {
+  //       variant: 'error',
+  //     });
+  //   }
+  //   setLoadingClear(false);
+  //   enqueueSnackbar('Clear terms list success', {
+  //     variant: 'success',
+  //   });
+  //   refreshData();
+  // };
 
   let content;
   if (isLoading) {
@@ -151,7 +151,7 @@ const Pembobotan = (props) => {
       ) : (
         <tbody>
           <tr>
-            <td colSpan="2" align="center">
+            <td colSpan="3" align="center">
               No data.
             </td>
           </tr>
@@ -214,11 +214,15 @@ const Pembobotan = (props) => {
                       color="primary"
                       size="sm"
                       onClick={processTerm}
-                      disabled={isLoading || props.terms.length > 0}
+                      disabled={
+                        isLoading ||
+                        props.terms.length > 0 ||
+                        props.textProcessings.length === 0
+                      }
                     >
                       Proses Pembobotan
                     </Button>
-                    <Button
+                    {/* <Button
                       color="danger"
                       size="sm"
                       onClick={clearTerms}
@@ -233,7 +237,7 @@ const Pembobotan = (props) => {
                       ) : (
                         'Clear Terms'
                       )}
-                    </Button>
+                    </Button> */}
                   </div>
                 </div>
               </CardHeader>
@@ -329,11 +333,14 @@ Pembobotan.layout = Admin;
 
 export async function getServerSideProps({ query }) {
   const terms = await fetchJson(
-    `http://localhost:3000/api/terms?page=${query.page}&size=${query.size}`
+    `${process.env.BASE_URL}/api/terms?page=${query.page}&size=${query.size}`
+  );
+  const textProcessings = await fetchJson(
+    `${process.env.BASE_URL}/api/text-processings?page=${query.page}&size=${query.size}`
   );
 
   return {
-    props: { terms, page: query.page, size: query.size }, // will be passed to the page component as props
+    props: { terms, textProcessings, page: query.page, size: query.size }, // will be passed to the page component as props
   };
 }
 

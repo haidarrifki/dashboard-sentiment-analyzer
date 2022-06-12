@@ -1,16 +1,7 @@
 import React from 'react';
 
 // reactstrap components
-import {
-  Card,
-  CardHeader,
-  Table,
-  Container,
-  Row,
-  Col,
-  CardTitle,
-  CardBody,
-} from 'reactstrap';
+import { Card, CardHeader, Table, Container, Row } from 'reactstrap';
 // layout for this page
 import Admin from 'layouts/Admin.js';
 // core components
@@ -19,8 +10,6 @@ import Header from 'components/Headers/HeaderTable.js';
 import fetchJson from '../../lib/fetchJson';
 
 const Pengujian = (props) => {
-  console.log('>>> Data');
-  console.log(props.data);
   return (
     <>
       <Header />
@@ -45,15 +34,27 @@ const Pengujian = (props) => {
                 </thead>
                 <tbody>
                   <tr>
-                    <td>{props.data.acc}</td>
-                    <td>1000</td>
+                    <td>{props.data.accuracy ? props.data.accuracy : '0%'}</td>
+                    <td>{props.classification.total}</td>
                     <td>
-                      {props.data.true_positive + props.data.true_negative}
+                      {props.data.true_positive && props.data.true_negative
+                        ? props.data.true_positive + props.data.true_negative
+                        : '0'}
                     </td>
                     <td>
-                      {props.data.false_positive + props.data.false_negative}
+                      {props.data.false_positive && props.data.false_negative
+                        ? props.data.false_positive + props.data.false_negative
+                        : '0'}
                     </td>
-                    <td>90:10</td>
+                    <td>
+                      {props.setting.settings.firstRatio
+                        ? props.setting.settings.firstRatio
+                        : '0'}
+                      :
+                      {props.setting.settings.secondRatio
+                        ? props.setting.settings.secondRatio
+                        : '0'}
+                    </td>
                   </tr>
                 </tbody>
               </Table>
@@ -89,15 +90,31 @@ const Pengujian = (props) => {
                     <th scope="col" className="bg-danger text-white">
                       NEGATIF
                     </th>
-                    <td>{props.data.true_positive}</td>
-                    <td>{props.data.false_positive}</td>
+                    <td>
+                      {props.data.true_positive
+                        ? props.data.true_positive
+                        : '0'}
+                    </td>
+                    <td>
+                      {props.data.false_positive
+                        ? props.data.false_positive
+                        : '0'}
+                    </td>
                   </tr>
                   <tr>
                     <th scope="col" className="bg-success text-white">
                       POSITIF
                     </th>
-                    <td>{props.data.false_negative}</td>
-                    <td>{props.data.true_negative}</td>
+                    <td>
+                      {props.data.false_negative
+                        ? props.data.false_negative
+                        : '0'}
+                    </td>
+                    <td>
+                      {props.data.true_negative
+                        ? props.data.true_negative
+                        : '0'}
+                    </td>
                   </tr>
                 </tbody>
               </Table>
@@ -113,10 +130,14 @@ Pengujian.layout = Admin;
 
 export async function getServerSideProps() {
   const data = await fetchJson(
-    `http://localhost:3000/api/classifications/results`
+    `${process.env.BASE_URL}/api/classifications/results`
   );
+  const classification = await fetchJson(
+    `${process.env.BASE_URL}/api/classifications/total`
+  );
+  const setting = await fetchJson(`${process.env.BASE_URL}/api/settings`);
   return {
-    props: { data }, // will be passed to the page component as props
+    props: { data, classification, setting }, // will be passed to the page component as props
   };
 }
 

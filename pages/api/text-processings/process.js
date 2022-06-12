@@ -25,18 +25,50 @@ export default withSession(async (req, res) => {
     }
 
     // clear collection text processings and settings first
-    await db.collection('text_processings').drop();
-    await db.collection('settings').drop();
+    await db.collection('text_processings').deleteMany();
+    await db.collection('classifications').deleteMany();
+    await db.collection('settings').deleteMany();
 
-    await db
-      .collection('settings')
-      .insertOne({ firstRatio: splitRatio[0], secondRatio: splitRatio[1] });
+    await db.collection('settings').insertOne({
+      firstRatio: parseInt(splitRatio[0]),
+      secondRatio: parseInt(splitRatio[1]),
+    });
 
     const execute = util.promisify(exec);
+    console.log(process.env.CMD_TEXT_PROCESSING);
     // execute python
-    const cmd = `python3 /home/harfi/skripsi/movie-review-sentiment/text_processing.py`;
+    const cmd = process.env.CMD_TEXT_PROCESSING;
     const { stdout, stderr } = await execute(cmd);
     if (stderr) throw stderr;
+
+    // find all text processings and insert to classifications
+    const totalDataset = await db
+      .collection('text_processings')
+      .countDocuments();
+
+    const totalDataClassification = (secondRatio / 100) * totalDataset;
+
+    const totalDataClassificationSplit = totalDataClassification / 2;
+
+    // get data from text processings and then limit
+    const textProcessingsPositive = await db
+      .collection('text_processings')
+      .find({ sentiment: 'positive' }, { projection: { _id: 0 } })
+      .limit(totalDataClassificationSplit)
+      .toArray();
+
+    const textProcessingsNegative = await db
+      .collection('text_processings')
+      .find({ sentiment: 'negative' }, { projection: { _id: 0 } })
+      .limit(totalDataClassificationSplit)
+      .toArray();
+
+    const dataTextProcessings = [
+      ...textProcessingsPositive,
+      ...textProcessingsNegative,
+    ];
+
+    await db.collection('classifications').insertMany(dataTextProcessings);
 
     return res.status(200).json({ message: stdout });
   } catch (error) {

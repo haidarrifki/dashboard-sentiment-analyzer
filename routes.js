@@ -24,7 +24,7 @@ var routes = [
     layout: '/admin',
   },
   {
-    path: '/klasifikasi?page=400&size=10',
+    path: '/klasifikasi?page=1&size=10',
     name: 'Klasifikasi',
     icon: 'ni ni-tag text-yellow',
     layout: '/admin',
