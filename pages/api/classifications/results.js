@@ -8,8 +8,6 @@ export default withSession(async (req, res) => {
       .collection('examinations')
       .findOne({}, { sort: { $natural: -1 } });
 
-    console.log(examination);
-
     if (!examination) {
       return res.status(200).json({
         accuracy: '0%',

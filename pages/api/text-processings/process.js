@@ -35,7 +35,6 @@ export default withSession(async (req, res) => {
     });
 
     const execute = util.promisify(exec);
-    console.log(process.env.CMD_TEXT_PROCESSING);
     // execute python
     const cmd = process.env.CMD_TEXT_PROCESSING;
     const { stdout, stderr } = await execute(cmd);
