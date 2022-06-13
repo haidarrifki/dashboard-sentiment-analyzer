@@ -70,7 +70,7 @@ function TextProcessing(props) {
   };
   // Loading process
   const [isLoading, setLoading] = useState(false);
-  const [isLoadingClear, setLoadingClear] = useState(false);
+  // const [isLoadingClear, setLoadingClear] = useState(false);
   // Modal
   const [modalOpen, setModalOpen] = React.useState(false);
   const [modalData, setModalData] = React.useState(null);
