@@ -61,29 +61,38 @@ const Dashboard = (props) => {
               <CardBody>
                 <ol>
                   <li>
-                    Menyiapkan dataset berupa text dan sentimen dari text
-                    tersebut bersifat positif atau negatif, kemudian menyimpan
-                    data tersebut ke dalam file excel dengan row berjudul text
-                    dan sentimen.
+                    Menyiapkan dataset berupa text dan sentimen positif atau
+                    negatif, kemudian simpan data tersebut ke dalam file excel
+                    dengan nama field review dan sentiment dalam bentuk format{' '}
+                    <b>.csv</b>. Untuk data sample bisa di download file nya di
+                    halaman <b>Dataset</b>.
                   </li>
                   <li>
                     Import file excel yang berisi dataset tersebut pada halaman
-                    dataset.
+                    <b> Dataset</b>.
                   </li>
                   <li>
-                    Selanjutnya proses text processing untuk menghilangkan
-                    elemen yang tidak diperlukan pada teks dataset, tekan tombol
-                    text processing kemudian data yang ada di database akan
-                    dilakukan processing text.
+                    Selanjutnya proses text untuk menghilangkan elemen yang
+                    tidak diperlukan pada teks dataset. Masuk ke halaman
+                    <b> Text Processing</b> kemudian tekan tombol
+                    <b> Proses Dataset</b> lalu masukkan rasio perbandingan data
+                    training dan data test, jika sudah klik <b>Proses</b>.
+                    kemudian data yang ada di database akan dilakukan processing
+                    text.
                   </li>
                   <li>
-                    Kemudian masuk ke halaman klasifikasi untuk menampilkan
-                    hasil klasifikasi.
+                    Kemudian masuk ke halaman <b>Pembobotan & Seleksi Fitur</b>{' '}
+                    dan tekan tombol <b>Proses Pembobotan </b>
+                    untuk menampilkan hasil terms <i>df</i> dan <i>tfidf</i>{' '}
+                    dari dataset text processing.
                   </li>
                   <li>
-                    Lalu masuk ke halaman pengujian untuk melakukan uji akurasi
-                    dengan menggunakan confusion matrix berdasarkan data uji
-                    validasi.
+                    Lalu masuk ke halaman <b>Klasifikasi</b> untuk menampilkan
+                    list data uji dan tekan tombol <b>Proses Data Uji</b>. Jika
+                    proses sudah berhasil maka sistem akan otomatis mengalihkan
+                    ke halaman <b>Pengujian </b>
+                    untuk melihat hasil akurasi dan confusion matrix berdasarkan
+                    data uji validasi.
                   </li>
                 </ol>
               </CardBody>

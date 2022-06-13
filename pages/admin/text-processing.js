@@ -274,9 +274,9 @@ function TextProcessing(props) {
             ]
           )}
         </p>
-        <h3>Teks</h3>
+        <h3>Sebelum Processing</h3>
         <p>{modalData.review}</p>
-        <h3>Hasil Preprocess</h3>
+        <h3>Sesudah Processing</h3>
         <p>{modalData.textProcessed}</p>
       </ModalBody>
     );
