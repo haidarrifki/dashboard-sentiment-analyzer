@@ -121,7 +121,11 @@ function Sidebar(props) {
             <DropdownToggle nav>
               <Media className="align-items-center">
                 <span className="avatar avatar-sm rounded-circle">
-                  <img alt="..." src={user?.photo} />
+                  <img
+                    alt="..."
+                    src={user?.photo}
+                    referrerpolicy="no-referrer"
+                  />
                 </span>
               </Media>
             </DropdownToggle>
