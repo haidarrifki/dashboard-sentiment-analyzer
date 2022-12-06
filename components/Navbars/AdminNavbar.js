@@ -46,7 +46,7 @@ function AdminNavbar({ brandText }) {
                     <img
                       alt="..."
                       src={user?.photo}
-                      referrerpolicy="no-referrer"
+                      referrerPolicy="no-referrer"
                     />
                   </span>
                   <Media className="ml-2 d-none d-lg-block">

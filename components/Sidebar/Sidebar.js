@@ -124,7 +124,7 @@ function Sidebar(props) {
                   <img
                     alt="..."
                     src={user?.photo}
-                    referrerpolicy="no-referrer"
+                    referrerPolicy="no-referrer"
                   />
                 </span>
               </Media>
